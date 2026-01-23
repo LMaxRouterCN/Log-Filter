@@ -1,0 +1,29 @@
+{
+  "General": {
+    "enableFilter": true,
+    "debugMode": false,
+    "maxCacheSize": 1000
+  },
+  "FilterRules": {
+    "filterRules": [
+      ".*Exception.*",
+      ".*stack trace.*",
+      ".*Could not pass event.*"
+    ],
+    "exactMatches": [
+      "This message will be completely filtered out"
+    ],
+    "loggerNames": [
+      "net.minecraft.server.MinecraftServer",
+      "com.some.noisy.mod"
+    ],
+    "logLevels": [
+      "TRACE",
+      "DEBUG"
+    ],
+    "excludePatterns": [
+      ".*IMPORTANT.*",
+      ".*CRITICAL ERROR.*"
+    ]
+  }
+}

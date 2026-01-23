@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="MIT"
+
+[[mods]]
+modId="logfilter"
+version="${file.jarVersion}"
+displayName="Log Filter"
+description='''
+A configurable log filtering mod for Minecraft Forge.
+Allows filtering out unwanted log messages based on patterns.
+'''
+
+[[dependencies.logfilter]]
+modId="forge"
+mandatory=true
+versionRange="[47,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.logfilter]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="BOTH"

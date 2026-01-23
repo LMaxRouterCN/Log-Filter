@@ -106,8 +106,6 @@ excludePatterns = [
 ]
 ```
 
-### Configuration Examples
-
 ## 🔨 Build
 
 If you want to compile this mod yourself:
@@ -115,6 +113,7 @@ If you want to compile this mod yourself:
 ./gradlew build
 ```
 The compiled JAR file is located in the `build/libs/` directory.
+
 ---
 
 ## Deep Dive

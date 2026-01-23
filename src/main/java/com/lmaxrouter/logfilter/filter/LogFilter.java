@@ -1,6 +1,6 @@
-package com.example.logfilter.filter;
+package com.lmaxrouter.logfilter.filter;
 
-import com.example.logfilter.config.FilterConfig;
+import com.lmaxrouter.logfilter.config.FilterConfig;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;

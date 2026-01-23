@@ -5,7 +5,7 @@ plugins {
 }
 
 version = '1.0.0'
-group = 'com.example.logfilter'
+group = 'com.lmaxrouter.logfilter'
 archivesBaseName = 'logfilter'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -52,11 +52,11 @@ jar {
     manifest {
         attributes([
                 "Specification-Title"     : "logfilter",
-                "Specification-Vendor"    : "example",
+                "Specification-Vendor"    : "lmaxrouter",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : "${version}",
-                "Implementation-Vendor"   : "example",
+                "Implementation-Vendor"   : "lmaxrouter",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }

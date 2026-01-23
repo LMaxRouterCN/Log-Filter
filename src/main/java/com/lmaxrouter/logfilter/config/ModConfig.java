@@ -1,4 +1,4 @@
-package com.example.logfilter.config;
+package com.lmaxrouter.logfilter.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 

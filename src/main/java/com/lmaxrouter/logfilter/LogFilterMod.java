@@ -1,7 +1,7 @@
-package com.example.logfilter;
+package com.lmaxrouter.logfilter;
 
-import com.example.logfilter.config.ModConfig;
-import com.example.logfilter.filter.LogFilterManager;
+import com.lmaxrouter.logfilter.config.ModConfig;
+import com.lmaxrouter.logfilter.filter.LogFilterManager;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;

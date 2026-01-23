@@ -1,4 +1,4 @@
-package com.example.logfilter.config;
+package com.lmaxrouter.logfilter.config;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -15,22 +15,22 @@ public class FilterConfig {
     private final int maxCacheSize;
 
     public FilterConfig() {
-        this.enableFilter = com.example.logfilter.config.ModConfig.enableFilter.get();
-        this.debugMode = com.example.logfilter.config.ModConfig.debugMode.get();
-        this.maxCacheSize = com.example.logfilter.config.ModConfig.maxCacheSize.get();
+        this.enableFilter = com.lmaxrouter.logfilter.config.ModConfig.enableFilter.get();
+        this.debugMode = com.lmaxrouter.logfilter.config.ModConfig.debugMode.get();
+        this.maxCacheSize = com.lmaxrouter.logfilter.config.ModConfig.maxCacheSize.get();
 
         // Compile regex patterns
-        this.filterPatterns = com.example.logfilter.config.ModConfig.filterRules.get().stream()
+        this.filterPatterns = com.lmaxrouter.logfilter.config.ModConfig.filterRules.get().stream()
                 .map(Pattern::compile)
                 .collect(Collectors.toList());
 
-        this.excludePatterns = com.example.logfilter.config.ModConfig.excludePatterns.get().stream()
+        this.excludePatterns = com.lmaxrouter.logfilter.config.ModConfig.excludePatterns.get().stream()
                 .map(Pattern::compile)
                 .collect(Collectors.toList());
 
-        this.exactMatches = List.copyOf(com.example.logfilter.config.ModConfig.exactMatches.get());
-        this.loggerNames = List.copyOf(com.example.logfilter.config.ModConfig.loggerNames.get());
-        this.logLevels = List.copyOf(com.example.logfilter.config.ModConfig.logLevels.get());
+        this.exactMatches = List.copyOf(com.lmaxrouter.logfilter.config.ModConfig.exactMatches.get());
+        this.loggerNames = List.copyOf(com.lmaxrouter.logfilter.config.ModConfig.loggerNames.get());
+        this.logLevels = List.copyOf(com.lmaxrouter.logfilter.config.ModConfig.logLevels.get());
     }
 
     public List<Pattern> getFilterPatterns() {

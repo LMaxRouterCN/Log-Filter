@@ -1,4 +1,4 @@
-package com.example.logfilter.filter;
+package com.lmaxrouter.logfilter.filter;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

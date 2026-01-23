@@ -7,8 +7,7 @@ modId="logfilter"
 version="${file.jarVersion}"
 displayName="Log Filter"
 description='''
-A configurable log filtering mod for Minecraft Forge.
-Allows filtering out unwanted log messages based on patterns.
+按照可配置的规则过滤删除日志中输出的条目
 '''
 
 [[dependencies.logfilter]]

@@ -1,9 +1,7 @@
-package com.example.logfilter.filter;
+package com.lmaxrouter.logfilter.filter;
 
-import com.example.logfilter.LogFilterMod;
-import com.example.logfilter.config.FilterConfig;
-import com.example.logfilter.config.ModConfig;
-import org.apache.logging.log4j.LogManager;
+import com.lmaxrouter.logfilter.LogFilterMod;
+import com.lmaxrouter.logfilter.config.FilterConfig;
 import org.apache.logging.log4j.core.*;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;

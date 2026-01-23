@@ -1,5 +1,7 @@
 # Log Filter
 
+<img height="300" alt="pack" src="https://github.com/user-attachments/assets/ec3abd11-e1e3-47df-a55b-9392fd4b9bb7" />
+
 一个轻量级日志过滤模组，旨在减少控制台和日志文件中的垃圾信息，让开发者和玩家能更专注于关键错误，并节省硬盘空间。
 
 ## 特性

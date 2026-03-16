@@ -152,15 +152,16 @@ Our mod performs the following operations via `LogFilterManager.java` when the g
     ```
     We inserted our custom `FilteringLogFilter` at the very front of the log processing chain.
     
-7.  **Interception and Decision (`FilteringLogFilter.filter` method)**:
-    Whenever Minecraft attempts to output a line of log, Log4j calls our `filter(LogEvent event)` method. Here we perform the following judgment logic (priority from high to low):
-    *   **Step A: Parse Event**. Convert Log4j's `LogEvent` into our custom defined `LogEntry` object for easier processing.
-    *   **Step B: Cache Check**. Calculate the hash value of the log content and see if this log exists in the cache. If yes, return `DENY` immediately without subsequent calculation. This is for performance optimization, preventing CPU overload due to the same error spamming the screen.
-    *   **Step C: Whitelist Check (`excludePatterns`)**. If the log matches a whitelist regex, return `NEUTRAL` (neutral/pass). The whitelist has the highest priority and is used to protect important logs.
-    *   **Step D: Logger Name Check (`loggerNames`)**. If the log's source class name is in the blacklist, return `DENY`.
-    *   **Step E: Log Level Check (`logLevels`)**. If the log level (e.g., `DEBUG`) is in the blacklist, return `DENY`.
-    *   **Step F: Exact Match Check (`exactMatches`)**. If the log message exactly matches a configured string, return `DENY`.
-    *   **Step G: Regex Rule Check (`filterRules`)**. If the log message matches a configured regex, return `DENY`.
+**7. Interception and Decision Making (`FilteringLogFilter.filter` method):**
+    Whenever Minecraft attempts to output a log line, Log4j invokes our `filter(LogEvent event)` method. To prevent game stuttering caused by log filtering, we adopt a "fail-fast" design, with the following logic priority:
+    *   **Step A: Extract Key Information.** Directly extract key details such as the Logger name and level from the Log4j `LogEvent`.
+    *   **Step B: Quick Check (Level & Logger).** Prioritize checking the log level (`logLevels`) and Logger name (`loggerNames`). This is an extremely low-overhead operation. If a match is found, the log is discarded immediately, **completely skipping the expensive message formatting and regex matching that follows**, significantly reducing main thread overhead.
+    *   **Step C: Message Formatting.** Only when a log passes the quick check and is not intercepted will `getFormattedMessage()` be called to generate the message text.
+    *   **Step D: Cache Check.** Calculate the hash value of the log content to check if it exists in the cache. If it does, return `DENY` immediately to avoid redundant computation.
+    *   **Step E: Whitelist Check (`excludePatterns`).** If the log matches a whitelist regex, return `NEUTRAL`. The whitelist has the highest priority and is used to protect important logs.
+    *   **Step F: Exact Match Check (`exactMatches`).** If the log message matches a configured string exactly, return `DENY`.
+    *   **Step G: Regex Rule Check (`filterRules`).** If the log message matches a configured regular expression, return `DENY`.
+
     
 8.  **Final Verdict**:
     *   If any of the above interception conditions match, we return `Result.DENY`. Upon receiving `DENY`, Log4j immediately discards the log, and it will not appear in the console or file.

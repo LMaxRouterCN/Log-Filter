@@ -1,87 +1,89 @@
 package com.lmaxrouter.logfilter.filter;
 
+import com.lmaxrouter.logfilter.LogFilterMod;
 import com.lmaxrouter.logfilter.config.FilterConfig;
+import org.apache.logging.log4j.Level;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class LogFilter {
     private final FilterConfig config;
-    private final Set<String> filteredCache;
+    private final Set<Integer> filteredCache;
 
     public LogFilter(FilterConfig config) {
         this.config = config;
         this.filteredCache = ConcurrentHashMap.newKeySet();
     }
 
-    /**
-     * Check if a log entry should be filtered out
-     * @return true if the log should be filtered (not displayed), false otherwise
-     */
-    public boolean shouldFilter(LogEntry entry) {
-        if (!config.isEnableFilter()) {
-            return false;
+    // --- 调试输出方法 ---
+    private void debug(String msg) {
+        if (config.isDebugMode()) {
+            // 使用 Mod 的专用 Logger，而不是 System.out
+            LogFilterMod.LOGGER.info("[DEBUG] {}", msg);
         }
+    }
 
-        String message = entry.getMessage();
-        String loggerName = entry.getLoggerName();
-        String level = entry.getLevel();
-
-        // Create cache key for this entry
-        String cacheKey = loggerName + ":" + level + ":" + message;
-
-        // Check cache first
-        if (filteredCache.contains(cacheKey)) {
-            return true;
-        }
-
-        // Check exclude patterns (whitelist) first
-        for (java.util.regex.Pattern excludePattern : config.getExcludePatterns()) {
-            if (excludePattern.matcher(message).find()) {
-                return false; // Don't filter whitelisted messages
+    public boolean shouldFilterByLevel(Level level) {
+        if (!config.isEnableFilter()) return false;
+        for (String configLevel : config.getLogLevels()) {
+            if (level.name().equalsIgnoreCase(configLevel)) {
+                return true;
             }
         }
+        return false;
+    }
 
-        // Check logger names
+    public boolean shouldFilterByLogger(String loggerName) {
+        if (!config.isEnableFilter()) return false;
         for (String name : config.getLoggerNames()) {
             if (loggerName.equals(name) || loggerName.startsWith(name + ".")) {
-                if (config.isDebugMode()) {
-                    System.out.println("[LogFilter] Filtered by logger name: " + loggerName);
-                }
-                addToCache(cacheKey);
                 return true;
             }
         }
+        return false;
+    }
 
-        // Check log levels
-        for (String configLevel : config.getLogLevels()) {
-            if (level.equalsIgnoreCase(configLevel)) {
-                if (config.isDebugMode()) {
-                    System.out.println("[LogFilter] Filtered by level: " + level);
-                }
-                addToCache(cacheKey);
+    // 用于 Manager 调用的静态日志方法
+    public void logDebug(org.apache.logging.log4j.core.LogEvent event, String reason) {
+        if (config.isDebugMode()) {
+            LogFilterMod.LOGGER.info("[DEBUG] Filtered '{}': Reason={}",
+                    event.getLoggerName(), reason);
+        }
+    }
+
+    public boolean isWhitelisted(String message) {
+        for (java.util.regex.Pattern excludePattern : config.getExcludePatterns()) {
+            if (excludePattern.matcher(message).find()) {
                 return true;
             }
         }
+        return false;
+    }
 
-        // Check exact matches
+    public boolean isInCache(int cacheKey) {
+        return filteredCache.contains(cacheKey);
+    }
+
+    public boolean shouldFilterContent(String message, int cacheKey) {
+        if (!config.isEnableFilter()) return false;
+
         for (String exact : config.getExactMatches()) {
             if (message.equals(exact)) {
-                if (config.isDebugMode()) {
-                    System.out.println("[LogFilter] Filtered exact match: " + exact);
-                }
                 addToCache(cacheKey);
+                if (config.isDebugMode()) {
+                    LogFilterMod.LOGGER.info("[DEBUG] Filtered by Exact Match: {}", exact);
+                }
                 return true;
             }
         }
 
-        // Check regex patterns
         for (java.util.regex.Pattern pattern : config.getFilterPatterns()) {
             if (pattern.matcher(message).find()) {
-                if (config.isDebugMode()) {
-                    System.out.println("[LogFilter] Filtered by pattern: " + pattern.pattern());
-                }
                 addToCache(cacheKey);
+                if (config.isDebugMode()) {
+                    LogFilterMod.LOGGER.info("[DEBUG] Filtered by Regex: {}", pattern.pattern());
+                }
                 return true;
             }
         }
@@ -89,18 +91,10 @@ public class LogFilter {
         return false;
     }
 
-    private void addToCache(String key) {
+    private void addToCache(int key) {
         if (filteredCache.size() >= config.getMaxCacheSize()) {
             filteredCache.clear();
         }
         filteredCache.add(key);
-    }
-
-    public void clearCache() {
-        filteredCache.clear();
-    }
-
-    public int getCacheSize() {
-        return filteredCache.size();
     }
 }

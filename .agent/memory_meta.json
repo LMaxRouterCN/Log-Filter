@@ -1,0 +1,30 @@
+{
+  "next_id": 3,
+  "memory": {
+    "1": {
+      "temp": 34.05616262881148,
+      "initial_temp": 100,
+      "tags": [
+        "LogFilter",
+        "异步化",
+        "项目"
+      ],
+      "pin": false,
+      "created_at": 1790613290.3887608,
+      "last_accessed": 1790613290.3887613
+    },
+    "2": {
+      "temp": 69.83372960937498,
+      "initial_temp": 100,
+      "tags": [
+        "环境",
+        "网络",
+        "构建",
+        "PokerAgent"
+      ],
+      "pin": false,
+      "created_at": 1790623310.7302577,
+      "last_accessed": 1790623310.730258
+    }
+  }
+}

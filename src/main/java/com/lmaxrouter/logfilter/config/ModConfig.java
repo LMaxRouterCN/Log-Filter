@@ -56,8 +56,15 @@ public class ModConfig {
         BUILDER.push("FilterRules");
 
         filterRules = BUILDER
-                .comment("Regex patterns to filter log messages",
-                         "用于过滤日志消息的正则表达式")
+                // [2026-10-09] 防坑补充: 真实案例 "(CUDA)" 括号未转义被当作正则捕获组, 规则静默失效, 故增加转义教学注释
+                .comment("Regex patterns to filter log messages. Matching is PARTIAL (regex find): a rule hits when it matches any part of the message, so wrapping with '.*' is unnecessary.",
+                         "用于过滤日志消息的正则表达式。匹配方式为包含匹配(find): 规则命中消息任意片段即生效, 无需用 '.*' 包裹。",
+                         "REGEX ESCAPING: metacharacters ()[]{}*+?.^$|\\ are special; escape them to match literally, e.g. literal parentheses must be written as \\( \\).",
+                         "正则转义: 元字符 ()[]{}*+?.^$|\\ 有特殊含义, 按字面匹配必须转义, 例如字面圆括号必须写成 \\( \\)。",
+                         "TOML ESCAPING: in double-quoted strings TOML consumes one level of backslashes, so write \"\\\\(CUDA\\\\)\"; in single-quoted literal strings write '\\(CUDA\\)' directly.",
+                         "TOML 转义: 双引号字符串中 TOML 会消耗一层反斜杠, 因此需写 \"\\\\(CUDA\\\\)\"; 单引号字面字符串直接写 '\\(CUDA\\)' 即可。",
+                         "An invalid regex (e.g. unbalanced parentheses) will crash config loading. Example: 'Terrain Diffusion \\(CUDA\\)' filters both 'uncached region requested' and 'finished generating region' lines.",
+                         "非法正则(如括号不闭合)会导致配置加载失败。示例: 'Terrain Diffusion \\(CUDA\\)' 可同时过滤 uncached region requested 与 finished generating region 两种日志。")
                 .defineList("filterRules", ArrayList::new,
                         obj -> obj instanceof String && !((String) obj).isEmpty());
 
@@ -81,7 +88,9 @@ public class ModConfig {
 
         excludePatterns = BUILDER
                 .comment("Regex patterns that will EXCLUDE logs from filtering (whitelist)",
-                         "将日志排除在过滤之外的正则表达式(白名单)")
+                         "Regex/TOML escaping rules are the same as filterRules (see its comment above).",
+                         "将日志排除在过滤之外的正则表达式(白名单)",
+                         "正则与 TOML 的转义规则与 filterRules 相同(见其上方注释)。")
                 .defineList("excludePatterns", ArrayList::new,
                         obj -> obj instanceof String);
 

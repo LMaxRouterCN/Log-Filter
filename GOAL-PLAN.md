@@ -55,4 +55,4 @@ BUILD SUCCESSFUL (2026-09-29 03:09, Java 17 / Gradle 8.8 / Forge 1.20.1-47.4.10)
 3. 入口类 deprecation 现代化是否做
 4. 冒烟结果确认 + 客户端实测(开关已代开, 直接 runClient;
    看点: 控制台日志流手感 / latest.log 完整性 / 退出时队列是否排干不丢尾)
-5. 通读本 GOAL-PLAN v4
+5. 通读本 GOAL-PLAN v4[2026-10-09] 配置防坑注释任务完成(自主授权, Max游戏挂机中): (1)ModConfig.java filterRules .comment() 扩为8行双语(find包含匹配语义/正则元字符转义/TOML双层转义/非法正则后果/真实案例 Terrain Diffusion (CUDA)); (2)excludePatterns .comment() 补2行指向 filterRules 转义规则; (3)README.md 与 README(EN).md 的 filterRules 小节后各插入 常见坑 引用块(正则层/TOML层/匹配语义/非法正则4条); (4)run/ 实例配置未动(Max手动改). 验证: gradlew compileJava BUILD SUCCESSFUL, 需 --offline 加 -Dnet.minecraftforge.gradle.check.certs=false 绕过 forge maven 限速与PKIX证书校验(环境事实见长期记忆002); 2个 deprecation 警告(LogFilterMod.java 的 ModLoadingContext.get/FMLJavaModLoadingContext.get)为既有代码非本次引入. 遗留待拍板: FilterConfig 构造期无异常处理(initialize/reload 裸 new, 用户非法正则将炸启动或热重载), 已写入收尾报告待 Max 决策.

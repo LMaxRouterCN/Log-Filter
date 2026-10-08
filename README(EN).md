@@ -17,7 +17,7 @@ A lightweight log filtering mod designed to reduce spam in the console and log f
 1. Download the mod's JAR file.
 2. Put the JAR file into the `mods` folder in your Minecraft installation directory.
 3. Launch the game once. The mod will automatically generate a default configuration file.
-4. Modify the configuration file as needed, then **restart the game** for the configuration to take effect.
+4. Modify the configuration file as needed and save — the config hot-reloads automatically (no game restart needed). Invalid regexes are skipped with a warning; see the notes below.
 > Or manually create a `logfilter-common.toml` file, modify the configuration as needed, and then launch the game.
 
 ## Configuration Brief
@@ -66,6 +66,13 @@ filterRules = [
     ".*Could not pass event.*"# Filter out specific event errors
 ]
 ```
+
+> **⚠ Common Pitfall: Regex Metacharacters & Double TOML Escaping**
+>
+> 1. **Regex layer**: `()[]{}*+?.^$|\` are regex metacharacters; escape them for literal matching. E.g. the parentheses in log `Terrain Diffusion (CUDA)` must be written as `\(CUDA\)` — otherwise they are parsed as a capture group and the rule silently never matches (the regex itself is valid, no error is shown).
+> 2. **TOML layer**: inside double-quoted strings TOML consumes one level of backslashes, so double them up: `"Terrain Diffusion \\(CUDA\\)"`; **single-quoted literal strings are recommended** (no TOML escaping needed): `'Terrain Diffusion \(CUDA\)'`.
+> 3. **Match semantics**: `filterRules` uses partial matching (find); a rule hits if it matches any part of the message, so no `.*` wrapping is needed.
+> 4. **Invalid regex** (e.g. unbalanced parentheses) is safely skipped: a WARN is written to the log and an in-game chat warning appears when you enter a world; all other rules keep working — no startup crash. Validate rules at regex101.com (Java flavor) first.
 
 #### 2. `exactMatches` (Exact Match)
 
@@ -127,6 +134,7 @@ The core idea of this mod is **interception**. It "hijacks" the data before Mine
 Minecraft 1.20.1 uses the **Log4j 2** logging framework.
 *   **Log Flow**: Game code generates log events (`LogEvent`) -> Passes to Log4j's `LoggerContext` -> Passes to `Appender` (e.g., console appender, file writer) -> Finally displayed on the screen.
 *   **Filter Mechanism**: Log4j allows mounting "filters (`Filter`)" on Loggers or Appenders.
+* **Async Output Pipeline**: all appenders on the root logger are wrapped into a Log4j2 `AsyncAppender` (enabled by default, configurable): console/file I/O runs on a background thread, the logging thread only pays the enqueue cost; queue size and overflow policy are configurable.
 
 #### 2. Code Execution Flow
 
@@ -166,6 +174,7 @@ Our mod performs the following operations via `LogFilterManager.java` when the g
 8.  **Final Verdict**:
     *   If any of the above interception conditions match, we return `Result.DENY`. Upon receiving `DENY`, Log4j immediately discards the log, and it will not appear in the console or file.
     *   If none match, we return `Result.NEUTRAL`. Log4j considers the filter to have "no opinion" and continues to pass the log to the next processor, eventually displaying it normally.
+9. **Config Hot-Reload**: after you edit and save `logfilter-common.toml`, Forge's config file watcher immediately fires the reload event: the async pipeline rebuilds idempotently (skipped if parameters unchanged), filter rules recompile, invalid regexes are skipped with warnings — no game restart needed, all event-driven.
 
 ---
 
@@ -233,3 +242,4 @@ If the `ShaderInstance` class is very noisy and you don't want to see anything i
 ```toml
 	logLevels = ["WARN"]
 ```
+

@@ -1,13 +1,14 @@
 modLoader="javafml"
 loaderVersion="[47,)"
-license="MIT"
+license="MPL-2.0"
 
 [[mods]]
 modId="logfilter"
 version="${file.jarVersion}"
 displayName="Log Filter"
 description='''
-按照可配置的规则过滤删除日志中输出的条目
+A lightweight log filtering mod that intercepts and drops log lines by configurable rules (regex / exact match / logger name / log level / whitelist) before they reach the console and log files. Features an async output pipeline (Log4j2 AsyncAppender) and config hot-reload.
+轻量级日志过滤模组：按可配置规则（正则/完全匹配/Logger名称/日志等级/白名单）在日志到达控制台和文件之前拦截丢弃。内置异步输出管线（Log4j2 AsyncAppender）与配置热重载。
 '''
 
 [[dependencies.logfilter]]

@@ -25,25 +25,67 @@ A lightweight log filtering mod designed to reduce spam in the console and log f
 The configuration file is located at: `config/logfilter-common.toml`
 Default configuration:
 ```toml
+
 [General]
 	#Enable or disable log filtering
+	#启用或禁用日志过滤
 	enableFilter = true
 	#Enable debug mode to see which logs are being filtered
+	#启用调试模式以查看哪些日志被过滤
 	debugMode = false
 	#Maximum size of filtered log cache (for duplicate detection)
+	#过滤日志缓存的最大容量(用于重复检测)
 	#Range: 100 ~ 10000
 	maxCacheSize = 1000
+
 [FilterRules]
-	#Regex patterns to filter log messages
+	#Regex patterns to filter log messages. Matching is PARTIAL (regex find): a rule hits when it matches any part of the message, so wrapping with '.*' is unnecessary.
+	#用于过滤日志消息的正则表达式。匹配方式为包含匹配(find): 规则命中消息任意片段即生效, 无需用 '.*' 包裹。
+	#REGEX ESCAPING: metacharacters ()[]{}*+?.^$|\ are special; escape them to match literally, e.g. literal parentheses must be written as \( \).
+	#正则转义: 元字符 ()[]{}*+?.^$|\ 有特殊含义, 按字面匹配必须转义, 例如字面圆括号必须写成 \( \)。
+	#TOML ESCAPING: in double-quoted strings TOML consumes one level of backslashes, so write "some \\(thing\\)"; in single-quoted literal strings write 'some \(thing\)' directly.
+	#TOML 转义: 双引号字符串中 TOML 会消耗一层反斜杠, 因此需写 "some \\(thing\\)"; 单引号字面字符串直接写 'some \(thing\)' 即可。
+	#An invalid regex (e.g. unbalanced parentheses) is safely skipped with a warning (log WARN + in-game chat message); other rules keep working.
+	#非法正则(如括号不闭合)会被安全跳过并告警(日志 WARN + 进入世界时聊天框提示), 其余规则照常生效。
 	filterRules = []
 	#Exact message strings to filter (case-sensitive)
+	#精确匹配并过滤的消息字符串(区分大小写)
 	exactMatches = []
 	#Logger names to completely filter (e.g., 'net.minecraft.server.MinecraftServer')
+	#完全过滤的 Logger 名称(例如 'net.minecraft.server.MinecraftServer')
 	loggerNames = []
 	#Log levels to filter: TRACE, DEBUG, INFO, WARN, ERROR, FATAL
+	#要过滤的日志级别: TRACE, DEBUG, INFO, WARN, ERROR, FATAL
 	logLevels = ["TRACE", "DEBUG"]
 	#Regex patterns that will EXCLUDE logs from filtering (whitelist)
+	#Regex/TOML escaping rules are the same as filterRules (see its comment above).
+	#将日志排除在过滤之外的正则表达式(白名单)
+	#正则与 TOML 的转义规则与 filterRules 相同(见其上方注释)。
 	excludePatterns = []
+
+[async]
+	#Enable async log output: wraps all root appenders into a Log4j2 AsyncAppender so console/file I/O runs on a background thread instead of the logging thread
+	#启用异步日志输出: 将 root logger 的全部 appender 包装进 Log4j2 AsyncAppender, 控制台/文件 I/O 转移到后台线程执行, 打日志的线程只付入队成本
+	enableAsyncLogging = true
+	#Capacity of the async queue (number of buffered log events)
+	#异步队列容量(缓冲的日志事件数量)
+	#Range: 128 ~ 65536
+	asyncQueueSize = 4096
+	#When queue is full: true = briefly block the logging thread (no log loss), false = drop the log event
+	#队列满时: true = 短暂阻塞打日志线程(不丢日志), false = 丢弃该条日志事件
+	asyncBlockingWhenFull = true
+	#Milliseconds to wait for the queue to drain before discarding remaining events (on pipeline rebuild and JVM shutdown)
+	#等待队列排干的毫秒数, 超时后丢弃剩余事件(在管线重建与 JVM 关闭时生效)
+	#Range: 0 ~ 600000
+	asyncShutdownTimeoutMs = 5000
+	#Capture caller location (class/method/line). Costs a stack walk per event; Minecraft's default log pattern does not need it
+	#捕获调用方位置(类/方法/行号)。每条日志付出一次栈遍历成本; Minecraft 默认日志格式用不到它, 保持 false 即可
+	asyncIncludeLocation = false
+	#Fully qualified class name of a org.apache.logging.log4j.core.async.BlockingQueueFactory implementation (empty = default ArrayBlockingQueue). Upgrade hook: a Disruptor-based factory can be injected later via JarJar without code changes
+	#BlockingQueueFactory 实现类的全限定名(留空 = 默认 ArrayBlockingQueue)。升级钩子: 后续可通过 JarJar 注入 Disruptor 队列工厂而无需改代码
+	asyncQueueFactoryClass = ""
+
+
 ```
 
 ### General (General Settings)

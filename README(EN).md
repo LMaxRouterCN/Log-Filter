@@ -69,8 +69,8 @@ filterRules = [
 
 > **⚠ Common Pitfall: Regex Metacharacters & Double TOML Escaping**
 >
-> 1. **Regex layer**: `()[]{}*+?.^$|\` are regex metacharacters; escape them for literal matching. E.g. the parentheses in log `Terrain Diffusion (CUDA)` must be written as `\(CUDA\)` — otherwise they are parsed as a capture group and the rule silently never matches (the regex itself is valid, no error is shown).
-> 2. **TOML layer**: inside double-quoted strings TOML consumes one level of backslashes, so double them up: `"Terrain Diffusion \\(CUDA\\)"`; **single-quoted literal strings are recommended** (no TOML escaping needed): `'Terrain Diffusion \(CUDA\)'`.
+> 1. **Regex layer**: `()[]{}*+?.^$|\` are regex metacharacters; escape them for literal matching. E.g. the parentheses in log `some (thing)` must be written as `\(thing\)` — otherwise they are parsed as a capture group and the rule silently never matches (the regex itself is valid, no error is shown).
+> 2. **TOML layer**: inside double-quoted strings TOML consumes one level of backslashes, so double them up: `"some \\(thing\\)"`; **single-quoted literal strings are recommended** (no TOML escaping needed): `'some \(thing\)'`.
 > 3. **Match semantics**: `filterRules` uses partial matching (find); a rule hits if it matches any part of the message, so no `.*` wrapping is needed.
 > 4. **Invalid regex** (e.g. unbalanced parentheses) is safely skipped: a WARN is written to the log and an in-game chat warning appears when you enter a world; all other rules keep working — no startup crash. Validate rules at regex101.com (Java flavor) first.
 

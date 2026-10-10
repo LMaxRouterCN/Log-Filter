@@ -1,3 +1,3 @@
-[当前任务] LogFilter 发版: license三处落地(MPL-2.0权威文本经gh api)/mods.toml双语/README(EN)四处手术/rebuild+jar内license复核, changelog终稿(英前中后+Added只异步+Fixed容错+基准压轴)已贴聊天等Max确认.
-下轮: A.Max确认changelog → ①git add -A+git commit(信息含版本+变更概要)②git push origin(HTTPS凭据助手已配)③gh release create "1.1.0+1.20.1" "build\libs\logfilter-1.1.0+1.20.1-forge.jar" --title "Log Filter 1.1.0 for Minecraft 1.20.1" --notes-file <临时md>(全路径gh.exe)④回执验URL报Max⑤旧包101.beta.jar若Max点头→Remove-Item弹确认. B.Max改稿→改后重走. C.exec回执异常→先修再走.
-红线: release创建必须以Max明确确认为前提; notes-file临时文件用$env:TEMP; push前git status核对无意外文件.
+[当前任务] LogFilter 1.1.1: 补丁轮已发(gradle.properties锚定bump+注释追加链, README双语三形态token替换)→发版全链(四门卫→build→MANIFEST→commit/push→release create→view验证).
+下轮: A.全绿 → 报release URL+资产名, 转待命(悬项: Modrinth挂链接/旧包删否/1.1.1后新悬项=README深入章节异步贴合度). B.门卫红(如GP hits≠1或README after>0)→读原文件核对锚点重手术, 不带病上线. C.构建红→按回执修. D.release建但资产/正文错→gh release edit/upload修(需Max知情).
+红线: push失败不建release(条件链内嵌); release编辑需Max知情.

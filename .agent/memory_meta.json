@@ -1,8 +1,8 @@
 {
-  "next_id": 4,
+  "next_id": 5,
   "memory": {
     "1": {
-      "temp": 5.953855510552938,
+      "temp": 4.606979898695192,
       "initial_temp": 100,
       "tags": [
         "LogFilter",
@@ -14,7 +14,7 @@
       "last_accessed": 1790613290.3887613
     },
     "2": {
-      "temp": 23.132408751248136,
+      "temp": 17.899416930173984,
       "initial_temp": 100,
       "tags": [
         "环境",
@@ -27,7 +27,7 @@
       "last_accessed": 1791477514.8317482
     },
     "3": {
-      "temp": 79.44286369164364,
+      "temp": 61.47137354500471,
       "initial_temp": 200,
       "tags": [
         "LogFilter",
@@ -39,6 +39,19 @@
       "pin": false,
       "created_at": 1791477830.9786444,
       "last_accessed": 1791477830.978645
+    },
+    "4": {
+      "temp": 85.7375,
+      "initial_temp": 100,
+      "tags": [
+        "环境",
+        "PokerAgent",
+        "编码",
+        "gh"
+      ],
+      "pin": false,
+      "created_at": 1791485077.1882904,
+      "last_accessed": 1791485077.1882904
     }
   }
 }

@@ -56,15 +56,15 @@ public class ModConfig {
         BUILDER.push("FilterRules");
 
         filterRules = BUILDER
-                // [2026-10-09] 防坑补充: 真实案例 "(CUDA)" 括号未转义被当作正则捕获组, 规则静默失效, 故增加转义教学注释
+                // [2026-10-09] 防坑补充: 真实案例 "(CUDA)" 括号未转义被当作正则捕获组, 规则静默失效, 故增加转义教学注释 (1.1.1: toml 示例已通用化为 some (thing), 避免特殊语境误导)
                 .comment("Regex patterns to filter log messages. Matching is PARTIAL (regex find): a rule hits when it matches any part of the message, so wrapping with '.*' is unnecessary.",
                          "用于过滤日志消息的正则表达式。匹配方式为包含匹配(find): 规则命中消息任意片段即生效, 无需用 '.*' 包裹。",
                          "REGEX ESCAPING: metacharacters ()[]{}*+?.^$|\\ are special; escape them to match literally, e.g. literal parentheses must be written as \\( \\).",
                          "正则转义: 元字符 ()[]{}*+?.^$|\\ 有特殊含义, 按字面匹配必须转义, 例如字面圆括号必须写成 \\( \\)。",
-                         "TOML ESCAPING: in double-quoted strings TOML consumes one level of backslashes, so write \"\\\\(CUDA\\\\)\"; in single-quoted literal strings write '\\(CUDA\\)' directly.",
-                         "TOML 转义: 双引号字符串中 TOML 会消耗一层反斜杠, 因此需写 \"\\\\(CUDA\\\\)\"; 单引号字面字符串直接写 '\\(CUDA\\)' 即可。",
-                         "An invalid regex (e.g. unbalanced parentheses) will crash config loading. Example: 'Terrain Diffusion \\(CUDA\\)' filters both 'uncached region requested' and 'finished generating region' lines.",
-                         "非法正则(如括号不闭合)会导致配置加载失败。示例: 'Terrain Diffusion \\(CUDA\\)' 可同时过滤 uncached region requested 与 finished generating region 两种日志。")
+                         "TOML ESCAPING: in double-quoted strings TOML consumes one level of backslashes, so write \"some \\\\(thing\\\\)\"; in single-quoted literal strings write 'some \\(thing\\)' directly.",
+                         "TOML 转义: 双引号字符串中 TOML 会消耗一层反斜杠, 因此需写 \"some \\\\(thing\\\\)\"; 单引号字面字符串直接写 'some \\(thing\\)' 即可。",
+                         "An invalid regex (e.g. unbalanced parentheses) is safely skipped with a warning (log WARN + in-game chat message); other rules keep working.",
+                         "非法正则(如括号不闭合)会被安全跳过并告警(日志 WARN + 进入世界时聊天框提示), 其余规则照常生效。")
                 .defineList("filterRules", ArrayList::new,
                         obj -> obj instanceof String && !((String) obj).isEmpty());
 

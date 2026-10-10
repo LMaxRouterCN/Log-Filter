@@ -29,6 +29,10 @@ Max 工作机(Windows 11 工作站)环境事实(2026-09实测, 2026-10-09补充�
 tag: 环境, 网络, 构建, PokerAgent
 <!-- END:002 -->
 <!-- ID:003 -->
-[2026-10-09] LogFilter 发版进行中: (1)Max三决策已落地执行: license MIT→MPL-2.0(LICENSE经gh api取mozilla/pdf.js权威全文, mods.toml license字段, build.gradle经查无license行无需动), mods.toml description双语化(英前中后, 原中文句语义为扩展版子集), README(EN)四处手术(安装热重载化/崩溃句改容错/AsyncOutputPipeline与ConfigHotReload插入, 锚点取自实读); (2)资源变更必须rebuild, jar内META-INF/mods.toml license复核; (3)changelog终稿按Max结构调整: Added只有异步管线/容错进Fixed/既有功能清单压轴做以后更新日志基准/语言英前中后, 已贴聊天等Max确认; (4)Modrinth已存在两个旧版本, changelog不写"首个正式版"; (5)gh已登录(LMaxRouterCN, keyring), repo=Log-Filter.git无旧tag; (6)commit范围=全部脏文件含.agent(Max拍板); (7)旧包101.beta.jar删除未决; (8)红线: release创建前正文必须Max确认; 待确认后→git add -A+commit→gh release create "1.1.0+1.20.1" 传jar→回执验URL.
+[2026-10-09] LogFilter 1.1.1 发版执行: (1)上轮gradle.properties门卫救场: 1.1.0命中2处(version行+历史注释行), 拒绝盲替换全链中止; 修正=version行锚定精确替换+注释行追加链(101.beta→1.1.0→1.1.1, 规则14不断史); (2)README双语CUDA手术: 三字面形态有序token替换(quad→dual→plain, 先长后短防子串误伤), 前后计数验证归零; (3)Max已批changelog(Fixed双语文档修正)+已令直接发1.1.1; (4)全链: 四门卫(ModConfig some≥4+crash清零+version 1.1.1恰1处+README CUDA=0)→build --offline certs=false→MANIFEST验1.1.1+1.20.1-forge→add/commit/push→gh release create "1.1.1+1.20.1" --target=SHA 传logfilter-1.1.1+1.20.1-forge.jar+notes-file→view回读(UTF8管道); (5)1.1.0 release=https://github.com/LMaxRouterCN/Log-Filter/releases/tag/1.1.0%2B1.20.1 在线; (6)悬项不变: Modrinth手动挂链接/旧包101.beta.jar删否/gh全路径C:\Program Files\GitHub CLI\gh.exe.
 tag: LogFilter, 待办, 发版, 配置, 正则
 <!-- END:003 -->
+<!-- ID:004 -->
+[2026-10-09] exec 管道编码事实: 本机系统码页非 UTF-8, 外部程序(gh 等)的 stdout 经 PowerShell 管道按系统码页(GBK)解码——gh --json 输出含中文(如 release body)时多字节序列奇偶错位会吞掉 JSON 结构字符, ConvertFrom-Json 报 "unexpected character" (事故实录: release view 验证 body 炸裂, 位置 2169, 字符 'n')。修复: exec 块开头 [Console]::OutputEncoding = [Text.Encoding]::UTF8 再接管道; 或让 gh --jq 只输出 ASCII(数字/字段名), 或多行捕获后 -join "`n" 再 ConvertFrom-Json。同样适用于任何外部命令的中文输出回传。
+tag: 环境, PokerAgent, 编码, gh
+<!-- END:004 -->

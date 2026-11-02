@@ -1,64 +1,95 @@
-# LogFilter 异步化改造 - 目标与计划 (v4 终态: 实施与验证全部完成)
+# LogFilter 多版本迁移 Stonecutter - 目标与计划 (v5)
 
 ## 任务总结
-"异步功能" = 把原版同步的日志输出(控制台渲染/文件写 I/O)换成异步, 过滤逻辑维持现状。
-程序化把 root logger 的 appender 链包进 Log4j2 自带 AsyncAppender(队列实现, 零新依赖),
-打日志线程只付入队成本; 过滤裁决仍在入队前同步完成(被滤事件零队列成本)。
+把 LogFilter 1.1.1 (Forge 1.20.1 单版本) 迁移到 Stonecutter 多版本多加载器体系:
+- 加载器矩阵: Fabric + NeoForge (无 Forge, max 指令)
+- MC 版本: 1.20.1 / 1.21.1 / 1.21.11
+- 五节点: 1.20.1-fabric / 1.21.1-fabric / 1.21.11-fabric / 1.21.1-neoforge / 1.21.11-neoforge
+- 版本号: 1.2.0, channel_tag 空 (stable)
+- 配置文件: config/logfilter-common.toml 三平台同一格式互通 (TOML, NightConfig)
+- 核心行为 (过滤 + 异步管线) 逐字平移, 不改逻辑, 存量问题 2/3/4 冻结不动
 
-## 最终架构
-[打日志线程] -> filter链(不变) -> AsyncAppender入队 -> [后台消费线程] -> DebugFile/Console/ServerGuiConsole/File
-- root AppenderRef 原样复用(level/filter 语义无损); updateLoggers 原子提交
-- 事务性 install(失败自动回滚原链) / 排干式 uninstall / JVM 关闭钩子
-- 可插拔队列工厂(反射, 默认 ArrayBlockingQueue) = Disruptor 升级钩子(JarJar 注入即可, 零代码改动)
-- 事件驱动: ModConfigEvent.Loading/Reloading, 配置签名幂等(参数没变不重建)
-- 顺带修复存量问题1: LogFilterManager.reload() 死代码复活, 过滤配置从此热重载
+## 架构
 
-## 文件清单(本次新增/修改)
-- config/ModConfig.java: +6 配置字段 + [async] 配置段(默认关)
-- async/AsyncPipelineConfig.java: 不可变配置快照(含签名)
-- async/AsyncLogPipeline.java: 安装器(幂等/事务/关闭钩子/反射队列工厂)
-- async/AsyncPipelineEvents.java: MOD bus 事件接线(Loading/Reloading)
-- gradle/wrapper/gradle-wrapper.properties: distributionUrl -> 腾讯镜像(见环境记录, 是否提交待定)
-- LogFilterMod.java: 零改动
+### 构建体系 (参考 stonecutter-mod-template 本地参考件)
+- Gradle 9.7.1 wrapper, distributionUrl 换腾讯镜像 (mirrors.cloud.tencent.com/gradle/)
+- settings.gradle.kts: pluginManagement (fabricmc + kikugie 两源 + pluginPortal + mavenCentral), includeBuild(build-logic), foojay 1.0.0, stonecutter 0.10-beta.1, loom-back-compat 0.4.1
+- stonecutter create: match("1.20.1","fabric") / match("1.21.1","fabric","neoforge") / match("1.21.11","fabric","neoforge"), vcsVersion = "1.20.1-fabric"
+- 根构建脚本 stonecutter.gradle.kts: swaps (mod_version/mod_id/mod_name/mod_group/minecraft) + loader 常量 + release 常量
+- 节点脚本 build.fabric.gradle.kts (loom-back-compat + loom) / build.neoforge.gradle.kts (moddev)
+- build-logic (kotlin-dsl, 平移模板后手术, 见清单)
+- CI: build.yml (push 触发全节点 buildAndCollect) / release.yml (tag 触发发布)
 
-## 编译
-BUILD SUCCESSFUL (2026-09-29 03:09, Java 17 / Gradle 8.8 / Forge 1.20.1-47.4.10)
+### build-logic 手术清单 (相对模板的改动)
+1. 砍 fletching-table: ModPlatformPlugin 的 apply 列表删该项, configureFletchingTable() 删
+2. processResources 的 kspKotlin 依赖删 (kotlin/ksp 对节点项目不再使用)
+3. Loader.kt: FabricManifest.mixins 与 ForgeManifest.mixins 硬编码改空列表 (无 mixin)
+4. Loader.kt: accessWidener / accessTransformers 字段置空 (无 AW/AT)
+5. entrypoints 硬编码 fabric main/client 恰好匹配 com.lmaxrouter.logfilter.platform.fabric.* 推导, 零改动; datagen 入口移除
+6. vanniktech 运行时 apply 块删 (不发 Maven Central)
+7. buildAndCollect 任务保留 (CI 产物收集)
+8. ModRootPlugin 保留 (publishMods + publish$version + runActive*)
+9. 版本目录裁剪: 保留 stonecutter/loomx/moddev/foojay/mod-publish/serialization-json/serialization-toml (Loader.kt 生成 manifest 要用); 砍 postprocess/fletching/mixinconstraints/vanniktech/ksp/kotlin-jvm
+10. cliff.toml + .env.template + workflows + .editorconfig 从模板平移; pre-commit 不平移
 
-## 冒烟测试证据 (2026-09-29 03:20-03:22, runServer 自动化双轮)
-1. Reloading 路径: 服务器 Done 后, 运行中把 toml enableAsyncLogging 翻 true
-   -> 同秒出现 [async] 安装行, 触发线程 Thread-1(Forge 文件监视线程, 验证跨线程安全),
-   包装 4 个 appender [DebugFile, Console, ServerGuiConsole, File], 服务器存活
-2. 幂等: 原样重写同一 toml 再触发 Reloading -> 安装行数保持 1(签名短路, 无重复安装)
-3. Loading 路径: 冷启动(toml 已开) -> 安装行 03:21:31 落在 main 线程 mod 构造期,
-   早于 "Done (6.308s)" 03:21:42, 开机时序正确
-4. 事件流动: Run C 安装行之后的整个启动日志风暴全部经异步管线送达 Console;
-   [async] 行本身出现在 latest.log -> 文件侧送达验证
-5. 已知伪影: 捕获日志中中文显示为 ??? 是代理侧 PowerShell 读日志的编码不匹配,
-   非 mod 输出问题; 客户端实测直接看游戏控制台即可
+### 源码包结构 (com.lmaxrouter.logfilter)
+- Constants.java: MOD_ID / MOD_VERSION / MOD_NAME / LOGGER (slf4j) [新写, 占位符用模板 swap 语法]
+- filter/: LogFilter.java / LogFilterManager.java [逐字平移, LogFilterMod 引用改 Constants]
+- async/: AsyncLogPipeline.java / AsyncPipelineConfig.java [平移; snapshot() 读 NFModConfig 或 CommonConfig 由平台接线决定]
+- config/: CommonConfig.java [新写: NightConfig TOML 自读, schema 与 Forge 版 ModConfig 完全一致, 双语注释平移] / FilterConfig.java [改写: 从 CommonConfig 读] / ConfigIssues.java [平移, LogFilterMod 改 Constants]
+- platform/fabric/: FabricEntrypoint.java [新写: ModInitializer, 启动 ConfigWatcher] / FabricClientEntrypoint.java [新写: ClientModInitializer, 注入 ConfigIssues 钩子 + ClientPlayConnectionEvents 冲刷] / FabricConfigWatcher.java [新写: NIO WatchService 事件驱动 + 500ms 防抖, 触发重读配置 + 管线重建] / ClientConfigWarningsFabric.java [新写: 聊天框展示]
+- platform/neoforge/: NeoforgeEntrypoint.java [新写: @Mod, registerConfig + ModConfigEvent.Loading/Reloading] / NFModConfig.java [改写自 Forge ModConfig: ModConfigSpec, 字段同 schema] / ClientConfigWarningsNeoForge.java [新写: @EventBusSubscriber(Dist.CLIENT) + LoggingIn]
+- 删: logfilter.json (v1.0 死资源) / LogFilterMod.java / AsyncPipelineEvents.java / ModConfig.java / ClientConfigWarnings.java (被平台版替代)
+- 资源: pack.png 保留; pack.mcmeta 视模板机制 (fabric/NF 构建均排除, 仓库可不带)
 
-## 环境事实与修复记录
-- services.gradle.org 本机不可达 -> wrapper URL 已改腾讯镜像 mirrors.cloud.tencent.com/gradle/
-- MC/Forge CDN 全可达但限速; MCP 1.20.1-47.4.10 全套缓存已就绪(冷启动约 4 分钟, 断点续传)
-- 代理 exec 3600s 上限 -> 长任务协议 = Start-Process 分离 + 日志落盘 + 轮询
-- 休眠: 原计划任务 AutoHibernate2h 已取消; 终态已武装 AutoHibernate30m
-  (30 分钟后 shutdown /h); 取消命令: schtasks /Delete /TN AutoHibernate30m /F
-- run/ 目录状态: eula=true; logfilter-common.toml 的 async 开关留 true
-  (Max 直接 runClient 即可实测); 冒烟生成的测试世界可随意删
+### 配置系统
+- Fabric: NightConfig 经 loom include 嵌入 (jar-in-jar), Apache-2.0 与 MPL-2.0 文件级分许可兼容, 待 max 审
+- NeoForge: 自带 NightConfig + ModConfigSpec (TOML)
+- 热重载: Fabric = WatchService 事件驱动; NF = ModConfigEvent.Reloading
+- 文件: config/logfilter-common.toml 三平台路径一致 = 互通
 
-## 编译警告存量(非本次引入, 已按规则上报)
-- LogFilterMod.java:19/25 ModLoadingContext.get()/FMLJavaModLoadingContext.get()
-  被 Forge 标记 removal(47.4.10 可用); 现代化 = 构造器注入 ModContainer; 是否做待定
+### 网络事实 (2026-11-03 实测)
+- wrapper 腾讯镜像 gradle-9.7.1 200 (validateDistributionUrl 可过)
+- fabricmc / kikugie-snapshots / plugins.gradle.org / repo1 / parchmentmc: 全 200
+- maven.neoforged.net: DNS 污染, 本地不可达 -> NF 节点构建全交 CI (墙外无障碍)
+- BMCLAPI: 有 neoforge jar 无 POM 无 neoform -> 本地 NF 构建死刑, 佐证上一条
+- gh/git: Steam++ 代理 + hosts + 系统证书库 = 健康
+- exec 3600s 上限 -> 本地 build 用 Start-Process 分离 + 日志落盘 + 轮询
 
-## Max 睡醒待拍板清单
-1. wrapper 镜像 URL 是否提交进仓库(不提交则 revert 该单行即可)
-2. 存量问题2 缓存满 clear 全清(建议半量淘汰) / 存量问题3 hash 碰撞误拦(建议不动) / 存量问题4 debug() 死代码(建议删)
-3. 入口类 deprecation 现代化是否做
-4. 冒烟结果确认 + 客户端实测(开关已代开, 直接 runClient;
-   看点: 控制台日志流手感 / latest.log 完整性 / 退出时队列是否排干不丢尾)
-5. 通读本 GOAL-PLAN v4[2026-10-09] 配置防坑注释任务完成(自主授权, Max游戏挂机中): (1)ModConfig.java filterRules .comment() 扩为8行双语(find包含匹配语义/正则元字符转义/TOML双层转义/非法正则后果/真实案例 Terrain Diffusion (CUDA)); (2)excludePatterns .comment() 补2行指向 filterRules 转义规则; (3)README.md 与 README(EN).md 的 filterRules 小节后各插入 常见坑 引用块(正则层/TOML层/匹配语义/非法正则4条); (4)run/ 实例配置未动(Max手动改). 验证: gradlew compileJava BUILD SUCCESSFUL, 需 --offline 加 -Dnet.minecraftforge.gradle.check.certs=false 绕过 forge maven 限速与PKIX证书校验(环境事实见长期记忆002); 2个 deprecation 警告(LogFilterMod.java 的 ModLoadingContext.get/FMLJavaModLoadingContext.get)为既有代码非本次引入. 遗留待拍板: FilterConfig 构造期无异常处理(initialize/reload 裸 new, 用户非法正则将炸启动或热重载), 已写入收尾报告待 Max 决策.
+### 版本矩阵 (maven 实查 2026-11-03)
+- fabric-loader: 0.19.2 (模板值; release 最新 0.20.1, 保守取模板)
+- fabric-api: 1.20.1 = 0.92.12 / 1.21.1 = 0.116.7 / 1.21.11 = 0.141.6
+- neoforge: 1.21.1 = 21.1.213 / 1.21.11 = 21.11.48
+- yarn 备胎 (1.20.1+b10 / 1.21.1+b3 / 1.21.11+b6), 主路线 mojmap
+- java: 1.20.1 -> 17 / 1.21.1+ -> 21
 
-## 2026-10-09 发布记录
-- 1.1.0+1.20.1 (Forge) 已发布: https://github.com/LMaxRouterCN/Log-Filter/releases/tag/1.1.0+1.20.1
-- commit 792dcb7 / tag 1.1.0+1.20.1 / 资产 logfilter-1.1.0+1.20.1-forge.jar (release view 验证通过)
-- 变更: 异步输出管线; 非法正则容错(新增 ConfigIssues/ClientConfigWarnings, 重写 FilterConfig); README 双语热重载与容错描述; mods.toml license MIT→MPL-2.0 + description 双语; LICENSE → MPL-2.0 (servo 权威源)
-- 待办: Modrinth 侧由 Max 手动挂 release 链接; build\libs\logfilter-101.beta.jar 删除未决; LogFilterMod 两处 deprecation 记入 1.1.1
+## 实施步骤
+1. [x] 信息收集 (代码 10/10, 模板全件, 网络全测)
+2. [x] GOAL-PLAN v5 落盘
+3. [x] git commit 快照 (含 .agent)
+4. [ ] 建 stonecutter 分支 + wrapper + 根级五件配置
+5. [ ] build-logic 平移 + 手术 + cliff/env/workflows/editorconfig
+6. [ ] 源码迁移 (按包结构清单)
+7. [ ] 逐节点 fabric build (1.20.1 -> 1.21.1 -> 1.21.11, Start-Process 协议, 首次全量拉依赖可能 30-60min/节点)
+8. [ ] server 冒烟 (active 版本 runServer: 启动不炸 / 过滤生效 / 热重载 / async 安装行 / 退出排干)
+9. [ ] push origin stonecutter -> 查 CI build.yml 五节点
+10. [ ] release: max 亲手打 tag 1.2.0 触发 release.yml (tomllib 验 tag = version+channel_tag)
+11. [ ] 完工: D:\Desktop\30分钟后休眠.bat (跑前读内容, AddHours(2) bug 则修 AddMinutes(30), 留痕)
+12. [ ] 终态 memory + GOAL-PLAN 收尾记录
+
+## 风险表
+- fabric 1.20.1 用 loom 1.18-SNAPSHOT (loom-back-compat 处理), 首次构建拉 SNAPSHOT, 网络通
+- mojmap 类名 1.21.11 漂移 (ResourceLocation -> Identifier 已知): ClientConfigWarnings 用 Component/ChatFormatting, 编译期见真章, 备 replacement
+- NightConfig jar-in-jar: 检查产物 jar 内嵌与 fabric.mod.json 依赖自动声明
+- WatchService 防抖: 编辑器保存可能产生双事件, 500ms 合并窗口
+- 旧 run/ (Forge) 残留: fabric runServer 共享 run/ 目录, 观察, 必要时切 run-fabric/
+- 免费版本 (publish.additionalVersions) 机制预留, 首发只发精确版本
+
+## 待 max 拍板
+1. NightConfig jar-in-jar (Apache-2.0) - 默认执行
+2. README 大改版 (多版本说明) - 构建通过后做, 不阻塞
+3. 产物命名 logfilter-1.2.0-fabric+1.21.1.jar 式 (模板 fullVersion 格式) - 默认执行
+4. 存量问题 2/3/4 + debug() 死代码: 冻结不动 (迁移不改行为)
+
+## 历史版本归档
+- v4 (1.1.1 时代): 见 git 历史 f0f0eb4 的 GOAL-PLAN.md (异步化改造 + 1.1.0/1.1.1 发布记录)

@@ -6,8 +6,13 @@ plugins {
 }
 
 stonecutter {
-	// 1.21.11+ mojmap 类名漂移: ResourceLocation -> Identifier (见 GOAL-PLAN 风险表)
-	replacements.string(current.parsed >= "1.21.11") {
+		// [CI 41702839086] 1.18.2 无 Component.literal (1.19.2-fabric 完整编译通过实证分界线=1.19);
+		// 全限定名构造器免 import 手术 (build.forge.gradle.kts 同款, 生成文本层已实证落地)
+		replacements.string(current.parsed < "1.19") {
+			replace("Component.literal(", "new net.minecraft.network.chat.TextComponent(")
+		}
+		// 1.21.11+ mojmap 类名漂移: ResourceLocation -> Identifier (见 GOAL-PLAN 风险表)
+		replacements.string(current.parsed >= "1.21.11") {
 		replace("ResourceLocation", "Identifier")
 		replace("location()", "identifier()")
 	}

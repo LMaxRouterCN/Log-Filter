@@ -17,6 +17,8 @@ stonecutter {
 	// 1.18.2 节点编译期文本替换为 LoggedInEvent (方法名/注释里的子串同被换, 无害)
 	replacements.string(current.parsed < "1.19") {
 	replace("LoggingIn", "LoggedInEvent")
+	// [CI 41702839086 判决] 1.18.2 无 Component.literal (1.19.2-fabric 编译通过实证分界线=1.19); 全限定名构造器免 import 手术
+	replace("Component.literal(", "new net.minecraft.network.chat.TextComponent(")
 	}
 }
 

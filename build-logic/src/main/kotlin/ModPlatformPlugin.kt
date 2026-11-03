@@ -8,6 +8,9 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
 import org.gradle.kotlin.dsl.apply
@@ -99,6 +102,17 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 			targetCompatibility = ctx.javaVersion
 			toolchain {
 				languageVersion.set(JavaLanguageVersion.of(ctx.javaVersion.majorVersion))
+			}
+		}
+		// [2026-11-03 构建修复] 源码为 UTF-8(中文注释): javac 走 daemon(JDK25, JEP400 默认 UTF-8)侥幸通过,
+		// javadoc.exe 由 toolchain(JDK17) fork, 中文 Windows 默认 GBK 读 UTF-8 报 100 个不可映射字符;
+		// 根治: 编译与 javadoc 显式声明源编码, 输出侧同步钉 UTF-8, 不依赖任何平台默认
+		tasks.withType<JavaCompile>().configureEach { options.encoding = "UTF-8" }
+		tasks.withType<Javadoc>().configureEach {
+			options.encoding = "UTF-8"
+			(options as? StandardJavadocDocletOptions)?.apply {
+				charSet = "UTF-8"
+				docEncoding = "UTF-8"
 			}
 		}
 	}

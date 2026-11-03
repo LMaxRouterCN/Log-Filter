@@ -3,7 +3,7 @@
 import dev.kikugie.stonecutter.build.StonecutterBuildExtension
 import kotlinx.serialization.json.Json
 import me.modmuss50.mpp.ReleaseType
-import net.peanuuutz.tomlkt.Toml
+import dev.eav.tomlkt.Toml
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository

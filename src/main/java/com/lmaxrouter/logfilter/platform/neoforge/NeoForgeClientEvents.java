@@ -6,9 +6,9 @@ import com.lmaxrouter.logfilter.client.ClientConfigWarnings;
 import com.lmaxrouter.logfilter.config.ConfigIssues;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent; // [2026-11-03 CI修复] EventBus 独立依赖包路径(模板同版本 21.1.213 先例); 原 neoforge.event 系迁移期未验证猜测, CI 41591331252 实证不存在
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.event.SubscribeEvent;
 
 /**
  * NeoForge 客户端事件接线 (game bus, 仅物理客户端加载, 服务端不可见)。

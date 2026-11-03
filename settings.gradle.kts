@@ -1,15 +1,17 @@
 // 根设置: 插件源 + Stonecutter 多版本节点声明 (5 节点矩阵)
 // Root settings: plugin repositories + Stonecutter version node declarations.
 pluginManagement {
+	// [2026-11-03 本地构建修复] 仓库序: KikuGie 前置(stonecutter / loom-back-compat 插件的发行处),
+	// 不可达的 NeoForged 垫底——本机网络对部分海外 maven 不稳定, 可靠源优先
 	repositories {
 		mavenLocal()
 		mavenCentral()
 		gradlePluginPortal()
-		maven("https://maven.fabricmc.net/") { name = "Fabric" }
-		maven("https://maven.neoforged.net/releases/") { name = "NeoForged" } // 本地 DNS 污染不可达, 仅 CI/快速失败兜底用
-		maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
 		maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
+		maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
+		maven("https://maven.fabricmc.net/") { name = "Fabric" }
 		maven("https://maven.parchmentmc.org") { name = "ParchmentMC" }
+		maven("https://maven.neoforged.net/releases/") { name = "NeoForged" } // 本地 DNS 污染不可达, 仅 CI 兜底
 	}
 	includeBuild("build-logic")
 }

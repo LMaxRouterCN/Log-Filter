@@ -98,11 +98,11 @@
 ## 实施步骤
 1. [x] 信息收集 (源码 10/10 + 模板全件含 forge 节点脚本 + 网络全测 + 版本锚点全实查)
 2. [x] GOAL-PLAN v6 落盘
-3. [ ] git commit 快照 (v6 改动前现状)
-4. [ ] build-logic 手术 (清单 1-7)
-5. [ ] 根配置: settings.gradle.kts (match 矩阵 + NeoForged maven 回补) / stonecutter.gradle.kts (deps.forge 常量) / libs.versions.toml (legacyforge 插件回补)
-6. [ ] 节点脚本 build.forge.gradle.kts (平移 + 裁剪)
-7. [ ] 源码: platform/forge 两类 + //? forge {} 条件块
+3. [x] git commit 快照 (8b0c6f8: v6 落盘即快照)
+4. [x] build-logic 手术 (978a232; 清单 2 砍掉, 3/4/7 完成, 5 并入 6, 6 待实测)
+5. [x] 根配置 (5e08b7d + 330eb27: settings 12 节点 match / deps 表新段 / legacyforge 回补 / files.disable 互斥)
+6. [x] 节点脚本 build.forge.gradle.kts (模板裁剪 + 事件名 1.18.2 分叉 replacements; jar 实证)
+7. [x] 源码: platform/forge 两类 (ForgeMod / ForgeClientEvents 镜像 NeoForge 双件; 事件名 jar 实证 1.18.2=LoggedInEvent / 1.19.2+1.20.1=LoggingIn)
 8. [ ] 本地试构建 fabric 1.18.2 (loom-back-compat 下探测试, 超模板下限属高危)
 9. [ ] push CI 全节点 buildAndCollect (forge + neoforge 全交 CI)
 10. [ ] 修问题循环: fabric 本地修, forge/neoforge 看日志修

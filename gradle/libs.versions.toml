@@ -19,4 +19,6 @@ serialization-toml = { module = "dev.eav.tomlkt:tomlkt", version.ref = "serializ
 [plugins]
 loom-back-compat = { id = "dev.kikugie.loom-back-compat", version.ref = "loomx" }
 neoforged-moddev = { id = "net.neoforged.moddev", version.ref = "neoforge-moddev" }
+# [LogFilter v6] legacyforge 与 moddev 同 artifact 同版本, forge 节点用 (marker 解析自 NeoForged maven, 仅 CI)
+legacyforge-moddev = { id = "net.neoforged.moddev.legacyforge", version.ref = "neoforge-moddev" }
 mod-publish-plugin = { id = "me.modmuss50.mod-publish-plugin", version.ref = "mod-publish" }

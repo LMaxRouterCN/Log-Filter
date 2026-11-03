@@ -55,8 +55,9 @@
 - settings.gradle.kts: pluginManagement 仓库 (mavenLocal + mavenCentral + gradlePluginPortal + Fabric + NeoForged + KikuGie Releases + KikuGie Snapshots + ParchmentMC), includeBuild(build-logic), foojay 1.0.0, stonecutter 0.10-beta.1, loom-back-compat 0.4.1
   - v6 变更: pluginManagement 回补 NeoForged maven (模板原样有, v5 裁剪掉了, forge 节点的 legacyforge 插件 marker 只能从这里解析; 本地不可达但声明无害, CI 墙外畅通)
 - stonecutter create:
-  - match("1.18.2", "fabric", "forge") / match("1.19.2", "fabric", "forge") / match("1.20.1", "fabric", "forge", "neoforge") / match("1.21.1", "fabric", "neoforge") / match("1.21.11", "fabric", "neoforge")
+  - match("1.18.2", "fabric", "forge") / match("1.19.2", "fabric", "forge") / match("1.20.1", "fabric", "forge", "neoforge") / match("1.20.4", "neoforge") / match("1.21.1", "fabric", "neoforge") / match("1.21.11", "fabric", "neoforge")
   - vcsVersion = "1.20.1-fabric"
+  - [2026-11-04 笔误修正] 原矩阵漏写 1.20.4-neoforge (合计 11 节点, 与任务总结的 12 节点矛盾), 补齐; 另: pluginManagement 的 NeoForged maven v5 从未删过 ("v6 回补"为笔误), 实际无需改动
 - 根构建脚本 stonecutter.gradle.kts: swaps (mod_version / mod_id / mod_name / mod_group / minecraft) + loader 常量 + release 常量
 - 节点脚本: build.fabric.gradle.kts (loom-back-compat + loom) / build.forge.gradle.kts (legacyforge) / build.neoforge.gradle.kts (moddev)
 - build-logic (kotlin-dsl, 平移模板后手术, 见清单)

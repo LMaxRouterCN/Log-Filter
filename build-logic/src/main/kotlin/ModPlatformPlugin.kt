@@ -160,9 +160,7 @@ abstract class ModPlatformPlugin @Inject constructor() : Plugin<Project> {
 		tasks.withType<Jar>().configureEach {
 			archiveBaseName.set(ctx.modId)
 			dependsOn(generateTask)
-			if (ctx.loader is Loader.Forge) {
-				manifest.attributes(ctx.loader.mixinConfigAttribute to "${ctx.modId}.mixins.json")
-			}
+			// [LogFilter v6] MixinConfigs jar 强写已删: 本项目无 mixin; Loader.Forge.mixinConfigAttribute 联动移除 (见 Loader.kt)
 		}
 	}
 

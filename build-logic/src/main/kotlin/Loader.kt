@@ -128,9 +128,11 @@ sealed class Loader(val id: String) {
 	}
 
 	object Forge : ForgeLike("forge") {
-		override val modManifestPath = "META-INF/mods.toml"
-		override val excludedResources = super.excludedResources + "META-INF/neoforge.mods.toml"
-		val mixinConfigAttribute = "MixinConfigs"
+	override val modManifestPath = "META-INF/mods.toml"
+	// [LogFilter v6] 无 mixin: mixinConfigAttribute 已删 (ModPlatformPlugin 的 MixinConfigs jar 强写联动删除);
+	// loaderVersion 维持 ForgeManifest 默认 "[2,)" 不参数化: 模板 1.19.2-forge 实证可用, 且 [2,) 区间涵盖
+	// Forge 40.x/43.x/47.x 与 NeoForge 20.4+/21.x 全部 javafml 版本 (版本数学 + 模板实证, 2026-11-04 查模板 Loader.kt)
+	override val excludedResources = super.excludedResources + "META-INF/neoforge.mods.toml" + "pack.mcmeta"
 	}
 
 	companion object {

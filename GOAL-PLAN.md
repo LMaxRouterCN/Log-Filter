@@ -63,13 +63,13 @@
 - CI: build.yml (push 触发全节点 buildAndCollect) / release.yml (tag 触发发布)
 
 ### build-logic 手术清单 (v5 已完成的不再列; 相对模板的 forge 相关改动)
-1. 版本目录回补: plugins 段加 legacyforge-moddev = { id = "net.neoforged.moddev.legacyforge", version.ref = "neoforge-moddev" }
-2. Loader.kt / ForgeLike.generateManifest: Forge 分支的 loaderVersion 改为取依赖表 required("forge") 的 forgeLikeVersionRange (显示 [40.3.12,) 等); NeoForge 分支保持 [2,)
-3. ModPlatformPlugin.configureJarTask: if (ctx.loader is Loader.Forge) 块里的 MixinConfigs attribute 强写逻辑删除 (LogFilter 无 mixin)
-4. Loader.kt: 删 Loader.Forge.mixinConfigAttribute (联动上一条)
-5. 节点脚本自行声明插件 (build.forge.gradle.kts 的 plugins 块 apply legacyforge), build-logic 的 ModPlatformPlugin 通过 platform DSL 感知 loader, 不重复 apply
-6. iconFile 字段 (NeoForge 26.2+): 旧 Forge mods.toml 解析器对未知字段的容忍度未证, 实测验, 失败则按 loader 分叉
-7. pack.mcmeta: resources 里真实存在, Fabric / NeoForge 打包已排除, Forge 分支 excludedResources 需补 (模板原样没排, 既有节点经验不排也无害, 倾向补排对齐)
+1. [ ] 版本目录回补: plugins 段加 legacyforge-moddev = { id = "net.neoforged.moddev.legacyforge", version.ref = "neoforge-moddev" }
+2. [x] [2026-11-04 砍掉] loaderVersion 参数化取消: 查模板 Loader.kt 实证其 ForgeLike.generateManifest 不传 loaderVersion (默认 [2,)), 模板 1.19.2-forge 构建通过; 版本数学亦支持: [2,) 涵盖 Forge 40/43/47 与 NeoForge 20.4+/21.x 全部 javafml。原设想的 [40.3.12,) 特化属无实证发明, 弃
+3. [x] ModPlatformPlugin.configureJarTask: MixinConfigs 强写删除 (LogFilter 无 mixin)
+4. [x] Loader.kt: 删 Loader.Forge.mixinConfigAttribute (联动上一条)
+5. [ ] 节点脚本自行声明插件 (build.forge.gradle.kts 的 plugins 块 apply legacyforge), build-logic 的 ModPlatformPlugin 通过 platform DSL 感知 loader, 不重复 apply
+6. [ ] iconFile 字段 (NeoForge 26.2+): 旧 Forge mods.toml 解析器对未知字段的容忍度未证, 实测验, 失败则按 loader 分叉
+7. [x] pack.mcmeta: Forge 分支 excludedResources 补排除 (与 Fabric/NeoForge 节点对齐)
 
 ### 节点脚本 build.forge.gradle.kts (从模板平移后裁剪)
 - plugins 块: id("mod-platform") + id("net.neoforged.moddev.legacyforge") 保留

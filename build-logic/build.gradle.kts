@@ -17,13 +17,14 @@ gradlePlugin {
 }
 
 repositories {
+	// [2026-11-03 本地构建修复] 仓库序: 可达源前置; NeoForged/Jitpack 本地不可达垫底, CI 全通不受序影响
 	mavenCentral()
 	gradlePluginPortal()
-	maven("https://maven.fabricmc.net/") { name = "Fabric" }
-	maven("https://maven.neoforged.net/releases/") { name = "NeoForged" }
-	maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
 	maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
-	maven("https://jitpack.io") { name = "Jitpack" }
+	maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
+	maven("https://maven.fabricmc.net/") { name = "Fabric" }
+	maven("https://maven.neoforged.net/releases/") { name = "NeoForged" } // 本地 DNS 污染不可达, 仅 CI 兜底
+	maven("https://jitpack.io") { name = "Jitpack" } // 本地不可达, 仅 CI 兜底
 }
 
 dependencies {

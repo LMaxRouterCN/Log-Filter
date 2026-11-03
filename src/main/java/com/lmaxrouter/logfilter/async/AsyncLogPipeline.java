@@ -1,6 +1,6 @@
 package com.lmaxrouter.logfilter.async;
 
-import com.lmaxrouter.logfilter.LogFilterMod;
+import com.lmaxrouter.logfilter.Constants;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
 // LogEvent: 仅用于把自定义队列工厂的泛型实参固定为 <LogEvent>(与 Builder.setBlockingQueueFactory 的形参类型精确匹配)
@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
  * 线程模型: 所有 install/uninstall 被 LOCK 串行化(配置事件可能在不同线程触发);
  * 状态字段 volatile, 保证任意线程读到一致的安装状态。
  * Log4j2 官方的运行时修改模式即 "改 LoggerConfig -> updateLoggers 原子提交"。
+ *
+ * [Stonecutter 迁移] 自 Forge 版平移: LogFilterMod.LOGGER -> Constants.LOGGER, 其余零改动。
  */
 public final class AsyncLogPipeline {
 
@@ -53,7 +55,9 @@ public final class AsyncLogPipeline {
 
     /**
      * 应用一份异步管线配置(幂等, 线程安全)。
-     * 只应在 ModConfigEvent.Loading / Reloading 事件中调用——此时 Forge 配置值 100% 已加载。
+     * 只应在 LogFilterBootstrap.init 启动链 / ConfigWatcher 文件事件回调中调用——
+     * 此刻配置文件已解析完成。
+     * (Stonecutter 迁移: 原为 Forge ModConfigEvent.Loading / Reloading 事件回调, 语义等价)
      */
     public static void apply(AsyncPipelineConfig config) {
         synchronized (LOCK) {
@@ -93,7 +97,7 @@ public final class AsyncLogPipeline {
         // 快照 root 现有 appender(事务回滚依据)
         Map<String, Appender> attachedAppenders = rootLoggerConfig.getAppenders();
         if (attachedAppenders.isEmpty()) {
-            LogFilterMod.LOGGER.warn("[async] root logger 没有任何 appender, 无可包装, 跳过安装");
+            Constants.LOGGER.warn("[async] root logger 没有任何 appender, 无可包装, 跳过安装");
             return;
         }
         // 优先复用 root 已配置的 AppenderRef 列表(自带每个 appender 的 level/filter 语义),
@@ -123,10 +127,10 @@ public final class AsyncLogPipeline {
         // 可插拔队列工厂(升级钩子): 配置非空 = 反射实例化自定义 BlockingQueueFactory
         // (未来 JarJar 注入 Disruptor 后填入工厂类名即可, 外壳零改动); 失败回退默认 ArrayBlockingQueue 不中止安装
         if (!config.getQueueFactoryClass().isEmpty()) {
-                        BlockingQueueFactory<LogEvent> factory = createQueueFactory(config.getQueueFactoryClass());
+            BlockingQueueFactory<LogEvent> factory = createQueueFactory(config.getQueueFactoryClass());
             if (factory != null) {
                 builder.setBlockingQueueFactory(factory);
-                LogFilterMod.LOGGER.info("[async] 使用自定义队列工厂: {}", config.getQueueFactoryClass());
+                Constants.LOGGER.info("[async] 使用自定义队列工厂: {}", config.getQueueFactoryClass());
             }
         }
 
@@ -155,12 +159,12 @@ public final class AsyncLogPipeline {
                 }
                 context.updateLoggers();
             } catch (Throwable rollbackFailure) {
-                LogFilterMod.LOGGER.error("[async] 事务回滚也失败了, 日志输出链处于未知状态!", rollbackFailure);
+                Constants.LOGGER.error("[async] 事务回滚也失败了, 日志输出链处于未知状态!", rollbackFailure);
             }
             // 停掉尚未提交的异步 appender(stop 幂等; 已停止的条目留在 registry 中无害,
             // 后续重建会以同名覆盖; Log4j 无公开的 registry 移除 API)
             async.stop(config.getShutdownTimeoutMs(), TimeUnit.MILLISECONDS);
-            LogFilterMod.LOGGER.error("[async] 异步管线安装失败, 已回滚到同步输出", t);
+            Constants.LOGGER.error("[async] 异步管线安装失败, 已回滚到同步输出", t);
             return;
         }
 
@@ -168,7 +172,7 @@ public final class AsyncLogPipeline {
         installedSignature = signature;
         installedConfig = config;
         registerShutdownHook(config);
-        LogFilterMod.LOGGER.info(
+        Constants.LOGGER.info(
                 "[async] 异步日志输出已启用: queueSize={}, blockingWhenFull={}, queueFactory={}, 包装了 {} 个 appender: {}",
                 config.getQueueSize(), config.isBlockingWhenFull(),
                 config.getQueueFactoryClass().isEmpty() ? "(default)" : config.getQueueFactoryClass(),
@@ -209,22 +213,22 @@ public final class AsyncLogPipeline {
         installed = null;
         installedSignature = null;
         installedConfig = null;
-        LogFilterMod.LOGGER.info("[async] 异步日志输出已停用({}), 已恢复同步输出链", reason);
+        Constants.LOGGER.info("[async] 异步日志输出已停用({}), 已恢复同步输出链", reason);
     }
 
     // ==================== 可插拔队列工厂(升级钩子) ====================
 
     @SuppressWarnings("unchecked")
-        private static BlockingQueueFactory<LogEvent> createQueueFactory(String className) {
-            try {
-                Class<?> type = Class.forName(className, true, AsyncLogPipeline.class.getClassLoader());
-                Constructor<?> constructor = type.getDeclaredConstructor();
-                constructor.setAccessible(true);
-                // 泛型擦除后强转安全: 合法实现类运行期创建的就是 Queue<LogEvent>;
-                // 若直接返回 BlockingQueueFactory<?>, 无法传入形参类型为 BlockingQueueFactory<LogEvent> 的 setter
-                return (BlockingQueueFactory<LogEvent>) constructor.newInstance();
+    private static BlockingQueueFactory<LogEvent> createQueueFactory(String className) {
+        try {
+            Class<?> type = Class.forName(className, true, AsyncLogPipeline.class.getClassLoader());
+            Constructor<?> constructor = type.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            // 泛型擦除后强转安全: 合法实现类运行期创建的就是 Queue<LogEvent>;
+            // 若直接返回 BlockingQueueFactory<?>, 无法传入形参类型为 BlockingQueueFactory<LogEvent> 的 setter
+            return (BlockingQueueFactory<LogEvent>) constructor.newInstance();
         } catch (Throwable t) {
-            LogFilterMod.LOGGER.error("[async] 自定义队列工厂 '{}' 加载失败, 回退为默认 ArrayBlockingQueue", className, t);
+            Constants.LOGGER.error("[async] 自定义队列工厂 '{}' 加载失败, 回退为默认 ArrayBlockingQueue", className, t);
             return null;
         }
     }

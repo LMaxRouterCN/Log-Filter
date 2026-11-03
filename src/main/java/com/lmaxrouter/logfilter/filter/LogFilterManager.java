@@ -1,6 +1,6 @@
 package com.lmaxrouter.logfilter.filter;
 
-import com.lmaxrouter.logfilter.LogFilterMod;
+import com.lmaxrouter.logfilter.Constants;
 import com.lmaxrouter.logfilter.config.ConfigIssues;
 import com.lmaxrouter.logfilter.config.FilterConfig;
 import org.apache.logging.log4j.Level;
@@ -12,6 +12,8 @@ import org.apache.logging.log4j.core.filter.AbstractFilter;
 
 import java.util.Objects;
 
+// [Stonecutter 迁移] 自 Forge 版平移: LogFilterMod.MOD_ID/LOGGER -> Constants, 事件链(谁调用 initialize/reload)
+// 由 Forge 的 Mod 构造器+ModConfigEvent 换成 LogFilterBootstrap + ConfigWatcher, 本类零感知。
 public class LogFilterManager {
     private static volatile LogFilter logFilter;
     private static FilteringLogFilter log4jFilter;
@@ -30,16 +32,16 @@ public class LogFilterManager {
         rootLoggerConfig.addFilter(log4jFilter);
         loggerContext.updateLoggers(configuration);
 
-        LogFilterMod.LOGGER.info("Log Filter initialized");
+        Constants.LOGGER.info("Log Filter initialized");
         // [长期记忆: 003] 构造期若有坏规则已入队, 配置就绪后请求一次展示(客户端钩子异步投递主线程; 服务端 no-op;
-        // 启动期聊天 HUD 未就绪时 flush 的玩家守卫会让问题留队, 由 LoggingIn 事件冲刷)
+        // 启动期聊天 HUD 未就绪时 flush 的玩家守卫会让问题留队, 由进世界事件冲刷)
         ConfigIssues.requestDisplay();
     }
 
     public static void reload() {
         FilterConfig newConfig = new FilterConfig();
         logFilter = new LogFilter(newConfig);
-        LogFilterMod.LOGGER.info("Log Filter reloaded");
+        Constants.LOGGER.info("Log Filter reloaded");
         // [长期记忆: 003] 热重载后立即请求展示: 世界内重载时新坏规则的警告经钩子异步弹到聊天框, 无需等下次进世界
         ConfigIssues.requestDisplay();
     }
@@ -50,7 +52,7 @@ public class LogFilterManager {
             // === 关键安全措施：防止递归 ===
             // 如果是本 Mod 自身产生的日志（包括调试日志），直接放行。
             // 否则开启调试模式后，调试日志会被过滤器捕获，导致无限递归打印日志。
-            if (event.getLoggerName().startsWith(LogFilterMod.MOD_ID)) {
+            if (event.getLoggerName().startsWith(Constants.MOD_ID)) {
                 return Result.NEUTRAL;
             }
 

@@ -53,6 +53,7 @@ deps.minecraft = "1.21.11"
 deps.fabric-api = "0.141.6+1.21.11"
 
 [neoforge]
+deps.nightconfig = "3.6.7"
 
 [neoforge."1.21.1"]
 deps.minecraft = "1.21.1"

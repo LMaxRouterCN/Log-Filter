@@ -1,14 +1,18 @@
 package com.lmaxrouter.logfilter.async;
 
-import com.lmaxrouter.logfilter.config.ModConfig;
+import com.lmaxrouter.logfilter.config.LogFilterConfig;
 
 /**
  * 异步输出管线的不可变配置快照 (v2 异步化改造)。
  *
- * 与 FilterConfig 采用同一模式: 在配置事件时刻从 Forge 配置读取并冻结为只读对象,
+ * 与 FilterConfig 采用同一模式: 在配置事件时刻从配置读取并冻结为只读对象,
  * 运行期零配置读取、天然线程安全。
- * 额外提供配置签名 (signature), 用于热重载时的幂等判断:
+ * 额外提供配置签名, 用于热重载时的幂等判断:
  * 签名未变则不重建管线, 避免无意义的队列切换与短暂的双份输出窗口。
+ *
+ * [Stonecutter 迁移] snapshot() 的读取源由 Forge ModConfig 换成 LogFilterConfig(NightConfig),
+ * 语义不变: 只应在 Bootstrap 启动链 / ConfigWatcher 文件事件回调中调用,
+ * 此刻 TOML 已解析完成, 不存在时序问题。
  */
 public final class AsyncPipelineConfig {
 
@@ -31,19 +35,15 @@ public final class AsyncPipelineConfig {
         this.queueFactoryClass = queueFactoryClass == null ? "" : queueFactoryClass.trim();
     }
 
-    /**
-     * 从当前 Forge 配置值读取一份快照。
-     * 只应在配置事件 (ModConfigEvent.Loading / Reloading) 中调用——
-     * 此时 ModConfig 的 ConfigValue 100% 已完成加载, 不存在时序问题。
-     */
+    /** 从当前配置文件读取一份快照。 */
     public static AsyncPipelineConfig snapshot() {
         return new AsyncPipelineConfig(
-                ModConfig.enableAsyncLogging.get(),
-                ModConfig.asyncQueueSize.get(),
-                ModConfig.asyncBlockingWhenFull.get(),
-                ModConfig.asyncShutdownTimeoutMs.get(),
-                ModConfig.asyncIncludeLocation.get(),
-                ModConfig.asyncQueueFactoryClass.get());
+                LogFilterConfig.asyncEnabled(),
+                LogFilterConfig.asyncQueueSize(),
+                LogFilterConfig.asyncBlockingWhenFull(),
+                LogFilterConfig.asyncShutdownTimeoutMs(),
+                LogFilterConfig.asyncIncludeLocation(),
+                LogFilterConfig.asyncQueueFactoryClass());
     }
 
     public boolean isEnabled() {
@@ -79,7 +79,7 @@ public final class AsyncPipelineConfig {
 
     /**
      * 配置签名: 所有影响管线形态的参数按序拼接。
-     * 用于 Reloading 事件的幂等判断 (签名相同 => 参数未变 => 不重建管线)。
+     * 用于热重载事件的幂等判断 (签名相同 => 参数未变 => 不重建管线)。
      * 包内可见, 不进入对外 API。
      */
     String signature() {

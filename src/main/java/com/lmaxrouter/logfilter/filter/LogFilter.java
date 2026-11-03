@@ -1,6 +1,6 @@
 package com.lmaxrouter.logfilter.filter;
 
-import com.lmaxrouter.logfilter.LogFilterMod;
+import com.lmaxrouter.logfilter.Constants;
 import com.lmaxrouter.logfilter.config.FilterConfig;
 import org.apache.logging.log4j.Level;
 
@@ -20,7 +20,7 @@ public class LogFilter {
     private void debug(String msg) {
         if (config.isDebugMode()) {
             // 使用 Mod 的专用 Logger，而不是 System.out
-            LogFilterMod.LOGGER.info("[DEBUG] {}", msg);
+            Constants.LOGGER.info("[DEBUG] {}", msg);
         }
     }
 
@@ -47,7 +47,7 @@ public class LogFilter {
     // 用于 Manager 调用的静态日志方法
     public void logDebug(org.apache.logging.log4j.core.LogEvent event, String reason) {
         if (config.isDebugMode()) {
-            LogFilterMod.LOGGER.info("[DEBUG] Filtered '{}': Reason={}",
+            Constants.LOGGER.info("[DEBUG] Filtered '{}': Reason={}",
                     event.getLoggerName(), reason);
         }
     }
@@ -72,7 +72,7 @@ public class LogFilter {
             if (message.equals(exact)) {
                 addToCache(cacheKey);
                 if (config.isDebugMode()) {
-                    LogFilterMod.LOGGER.info("[DEBUG] Filtered by Exact Match: {}", exact);
+                    Constants.LOGGER.info("[DEBUG] Filtered by Exact Match: {}", exact);
                 }
                 return true;
             }
@@ -82,7 +82,7 @@ public class LogFilter {
             if (pattern.matcher(message).find()) {
                 addToCache(cacheKey);
                 if (config.isDebugMode()) {
-                    LogFilterMod.LOGGER.info("[DEBUG] Filtered by Regex: {}", pattern.pattern());
+                    Constants.LOGGER.info("[DEBUG] Filtered by Regex: {}", pattern.pattern());
                 }
                 return true;
             }

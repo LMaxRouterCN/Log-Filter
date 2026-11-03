@@ -58,6 +58,9 @@ repositories {
 }
 
 dependencies {
+	// NightConfig: 编译期需要(源码 import), 运行期由 NeoForge 发行版自带(FML 配置层即构建于其上), 仅 compileOnly 不嵌入
+	compileOnly("com.electronwill.night-config:core:${prop("deps.nightconfig")}")
+	compileOnly("com.electronwill.night-config:toml:${prop("deps.nightconfig")}")
 }
 
 // moddev 的产物任务必须晚于 stonecutter 源码生成 (节点源码先切版本再编译)

@@ -11,6 +11,10 @@ stonecutter {
 		replace("ResourceLocation", "Identifier")
 		replace("location()", "identifier()")
 	}
+	// [2026-11-03 构建修复] active 节点裸编共享根 src, //? 门控注释对 javac 不可见,
+	// 需把对端 loader 的平台源整个排除出编译(DisabledSourceSpec 路径排除, 相对 src/main);
+	// 非 active 节点编译 generated 剥离副本, 行为不变
+	files.disable(true, "**/platform/neoforge/**")
 }
 
 platform {

@@ -1,3 +1,4 @@
+//? fabric {
 package com.lmaxrouter.logfilter.platform.fabric;
 
 import com.lmaxrouter.logfilter.client.ClientConfigWarnings;
@@ -12,6 +13,7 @@ import net.minecraft.client.Minecraft;
  *  1) 钩子注入: ConfigIssues 展示钩子把 flush 经 Minecraft.execute 投递主线程;
  *  2) 进世界冲刷: 启动期(主 entrypoint 先于本类执行, 聊天 HUD 不存在)留队的问题在 JOIN 消费。
  * 本类只在物理客户端加载, 服务端不可见。
+ * [Stonecutter 条件块] 整文件包进 //? fabric {}: neoforge 节点编译时本文件被剔除为空。
  */
 public class FabricClientEntrypoint implements ClientModInitializer {
     @Override
@@ -25,3 +27,4 @@ public class FabricClientEntrypoint implements ClientModInitializer {
                 ClientConfigWarnings.flush());
     }
 }
+//?}

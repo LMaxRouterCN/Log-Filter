@@ -106,7 +106,8 @@ public final class ConfigWatcher {
         LogFilterConfig.reload();
         // AsyncLogPipeline.apply 幂等: 参数签名未变则什么都不做, 变了才事务性重建管线
         AsyncLogPipeline.apply(AsyncPipelineConfig.snapshot());
-        // 过滤配置热生效(新增规则/删规则立即起效, 无需重启)
+        // [长期记忆: 001] 复活 LogFilterManager.reload() 死代码(原接线点为 Forge AsyncPipelineEvents.onConfigReloading):
+        // 过滤配置随文件事件同步刷新, 从此"改配置文件不生效必须重启游戏"的坑被填掉
         LogFilterManager.reload();
         // 坏正则等问题的客户端反馈(服务端 no-op)
         ConfigIssues.requestDisplay();

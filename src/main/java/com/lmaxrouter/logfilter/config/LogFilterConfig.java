@@ -23,8 +23,8 @@ import java.util.List;
  */
 public final class LogFilterConfig {
 
-    /** 配置文件名: 与 Forge 时代一致(Forge COMMON config 命名规则 = modid + ".toml") */
-    public static final String CONFIG_FILE_NAME = "logfilter.toml";
+    /** 配置文件名: 与 Forge 时代一致(Forge COMMON 命名规则 = modid + "-common.toml"), 旧用户配置零迁移直接复用 */
+    public static final String CONFIG_FILE_NAME = "logfilter-common.toml";
 
     // ==================== 键定义 ====================
 
@@ -61,6 +61,21 @@ public final class LogFilterConfig {
     private static final long DEFAULT_ASYNC_SHUTDOWN_TIMEOUT = 5000L;
     private static final boolean DEFAULT_ASYNC_INCLUDE_LOCATION = false;
     private static final String DEFAULT_ASYNC_QUEUE_FACTORY = "";
+
+    // ==================== 范围钳制边界 (对齐 Forge defineInRange) ====================
+    // [2026-11-03 迁移核对] Forge 版三个数值配置带 defineInRange, 越界值被 FML 收敛到边界;
+    // 自读 TOML 无 FML 层, 若不钳制则越界值原样放行(行为漂移),
+    // 故读取层用同款边界收敛(见下方 clampInt/clampLong)。
+
+    /** maxCacheSize 合法区间 [100, 10000] (Forge: defineInRange(..., 100, 10000)) */
+    private static final int MIN_MAX_CACHE_SIZE = 100;
+    private static final int MAX_MAX_CACHE_SIZE = 10000;
+    /** asyncQueueSize 合法区间 [128, 65536] (Forge: defineInRange(..., 128, 65536)) */
+    private static final int MIN_ASYNC_QUEUE_SIZE = 128;
+    private static final int MAX_ASYNC_QUEUE_SIZE = 65536;
+    /** asyncShutdownTimeoutMs 合法区间 [0, 600000] (Forge: defineInRange(..., 0L, 600000L)) */
+    private static final long MIN_ASYNC_SHUTDOWN_TIMEOUT = 0L;
+    private static final long MAX_ASYNC_SHUTDOWN_TIMEOUT = 600000L;
 
     /** 当前配置实例; null = 尚未 init。volatile: Watcher 线程写 / 任意线程读 */
     private static volatile CommentedFileConfig config;
@@ -219,7 +234,8 @@ public final class LogFilterConfig {
     }
 
     public static int maxCacheSize() {
-        return integer(KEY_MAX_CACHE_SIZE, DEFAULT_MAX_CACHE_SIZE);
+        return clampInt(integer(KEY_MAX_CACHE_SIZE, DEFAULT_MAX_CACHE_SIZE),
+                MIN_MAX_CACHE_SIZE, MAX_MAX_CACHE_SIZE);
     }
 
     public static List<String> filterRules() {
@@ -247,7 +263,8 @@ public final class LogFilterConfig {
     }
 
     public static int asyncQueueSize() {
-        return integer(KEY_ASYNC_QUEUE_SIZE, DEFAULT_ASYNC_QUEUE_SIZE);
+        return clampInt(integer(KEY_ASYNC_QUEUE_SIZE, DEFAULT_ASYNC_QUEUE_SIZE),
+                MIN_ASYNC_QUEUE_SIZE, MAX_ASYNC_QUEUE_SIZE);
     }
 
     public static boolean asyncBlockingWhenFull() {
@@ -255,7 +272,8 @@ public final class LogFilterConfig {
     }
 
     public static long asyncShutdownTimeoutMs() {
-        return longValue(KEY_ASYNC_SHUTDOWN_TIMEOUT, DEFAULT_ASYNC_SHUTDOWN_TIMEOUT);
+        return clampLong(longValue(KEY_ASYNC_SHUTDOWN_TIMEOUT, DEFAULT_ASYNC_SHUTDOWN_TIMEOUT),
+                MIN_ASYNC_SHUTDOWN_TIMEOUT, MAX_ASYNC_SHUTDOWN_TIMEOUT);
     }
 
     public static boolean asyncIncludeLocation() {
@@ -285,6 +303,15 @@ public final class LogFilterConfig {
             return i.longValue();
         }
         return v instanceof Long l ? l : def;
+    }
+
+    // [2026-11-03 迁移核对] 范围钳制: 对齐 Forge defineInRange 越界收敛语义(超范围值收敛到边界, 不报错不拒绝)
+    private static int clampInt(int v, int min, int max) {
+        return Math.max(min, Math.min(v, max));
+    }
+
+    private static long clampLong(long v, long min, long max) {
+        return Math.max(min, Math.min(v, max));
     }
 
     private static String string(String key, String def) {

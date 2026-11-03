@@ -36,16 +36,16 @@
 - Constants.java: MOD_ID / MOD_VERSION / MOD_NAME / LOGGER (slf4j) [新写, 占位符用模板 swap 语法]
 - filter/: LogFilter.java / LogFilterManager.java [逐字平移, LogFilterMod 引用改 Constants]
 - async/: AsyncLogPipeline.java / AsyncPipelineConfig.java [平移; snapshot() 读 NFModConfig 或 CommonConfig 由平台接线决定]
-- config/: CommonConfig.java [新写: NightConfig TOML 自读, schema 与 Forge 版 ModConfig 完全一致, 双语注释平移] / FilterConfig.java [改写: 从 CommonConfig 读] / ConfigIssues.java [平移, LogFilterMod 改 Constants]
-- platform/fabric/: FabricEntrypoint.java [新写: ModInitializer, 启动 ConfigWatcher] / FabricClientEntrypoint.java [新写: ClientModInitializer, 注入 ConfigIssues 钩子 + ClientPlayConnectionEvents 冲刷] / FabricConfigWatcher.java [新写: NIO WatchService 事件驱动 + 500ms 防抖, 触发重读配置 + 管线重建] / ClientConfigWarningsFabric.java [新写: 聊天框展示]
-- platform/neoforge/: NeoforgeEntrypoint.java [新写: @Mod, registerConfig + ModConfigEvent.Loading/Reloading] / NFModConfig.java [改写自 Forge ModConfig: ModConfigSpec, 字段同 schema] / ClientConfigWarningsNeoForge.java [新写: @EventBusSubscriber(Dist.CLIENT) + LoggingIn]
-- 删: logfilter.json (v1.0 死资源) / LogFilterMod.java / AsyncPipelineEvents.java / ModConfig.java / ClientConfigWarnings.java (被平台版替代)
+- config/: LogFilterConfig.java [新写: NightConfig TOML 自读单例, schema/默认值/范围钳制与 Forge 版 ModConfig 一致, 文件名 logfilter-common.toml 旧配置零迁移] / FilterConfig.java [改写: 从 LogFilterConfig 读] / ConfigIssues.java [平移, LogFilterMod 改 Constants]
+- platform/fabric/: FabricEntrypoint.java [新写: ModInitializer → LogFilterBootstrap.init] / FabricClientEntrypoint.java [新写: ClientModInitializer, 注入 ConfigIssues 钩子 + ClientPlayConnectionEvents.JOIN 冲刷]; 整文件 //? fabric {} 条件块; ConfigWatcher 平台无关置于 async/, 聊天框展示复用 client/ClientConfigWarnings
+- platform/neoforge/: NeoForgeMod.java [新写: @Mod 构造器 → LogFilterBootstrap.init(FMLPaths.CONFIGDIR)] / NeoForgeClientEvents.java [新写: @EventBusSubscriber(Dist.CLIENT) + LoggingIn 冲刷]; 整文件 //? neoforge {} 条件块
+- 删: logfilter.json (v1.0 死资源) / LogFilterMod.java / AsyncPipelineEvents.java / ModConfig.java (职责由 LogFilterBootstrap / ConfigWatcher / LogFilterConfig 承接); ClientConfigWarnings.java 保留 (纯 flush 本体, 双平台共用)
 - 资源: pack.png 保留; pack.mcmeta 视模板机制 (fabric/NF 构建均排除, 仓库可不带)
 
 ### 配置系统
 - Fabric: NightConfig 经 loom include 嵌入 (jar-in-jar), Apache-2.0 与 MPL-2.0 文件级分许可兼容, 待 max 审
-- NeoForge: 自带 NightConfig + ModConfigSpec (TOML)
-- 热重载: Fabric = WatchService 事件驱动; NF = ModConfigEvent.Reloading
+- NeoForge: NightConfig compileOnly (发行版自带, 不嵌入); 配置层与 fabric 完全同构 = LogFilterConfig 自读 TOML, 不用 ModConfigSpec
+- 热重载: 双平台统一 = async/ConfigWatcher (NIO WatchService 事件驱动, 批内合并 + 下游幂等吸收), 不依赖 loader 配置事件
 - 文件: config/logfilter-common.toml 三平台路径一致 = 互通
 
 ### 网络事实 (2026-11-03 实测)

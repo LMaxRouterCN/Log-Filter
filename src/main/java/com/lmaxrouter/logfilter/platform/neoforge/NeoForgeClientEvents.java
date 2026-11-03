@@ -1,3 +1,4 @@
+//? neoforge {
 package com.lmaxrouter.logfilter.platform.neoforge;
 
 import com.lmaxrouter.logfilter.Constants;
@@ -14,6 +15,7 @@ import net.neoforged.neoforge.event.SubscribeEvent;
  * [Stonecutter 迁移] 替代原 Forge ClientConfigWarnings 的 @EventBusSubscriber(Dist.CLIENT) 接线:
  *  1) 钩子注入: ConfigIssues 展示钩子把 flush 经 Minecraft.execute 投递主线程;
  *  2) 进世界冲刷: 启动期留队的坏规则问题在 LoggingIn 消费。
+ * [Stonecutter 条件块] 整文件包进 //? neoforge {}: fabric 节点编译时本文件被剔除为空。
  */
 @EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)
 public final class NeoForgeClientEvents {
@@ -34,3 +36,4 @@ public final class NeoForgeClientEvents {
     private NeoForgeClientEvents() {
     }
 }
+//?}

@@ -1,3 +1,4 @@
+//? neoforge {
 package com.lmaxrouter.logfilter.platform.neoforge;
 
 import com.lmaxrouter.logfilter.Constants;
@@ -9,6 +10,8 @@ import net.neoforged.fml.loading.FMLPaths;
  * NeoForge 主入口 (neoforge.mods.toml 由 build-logic 生成, modId = Constants.MOD_ID)。
  * [Stonecutter 迁移] 替代原 Forge LogFilterMod 构造器: 全部启动逻辑在
  * LogFilterBootstrap.init, 平台层只剩"提供 config 目录"一件事。
+ * [Stonecutter 条件块] 整文件包进 //? neoforge {}: fabric 节点编译时本文件被剔除为空,
+ * 避免 net.neoforged.* import 在 fabric classpath 上炸编译。
  */
 @Mod(Constants.MOD_ID)
 public class NeoForgeMod {
@@ -17,3 +20,4 @@ public class NeoForgeMod {
         LogFilterBootstrap.init(FMLPaths.CONFIGDIR.get());
     }
 }
+//?}

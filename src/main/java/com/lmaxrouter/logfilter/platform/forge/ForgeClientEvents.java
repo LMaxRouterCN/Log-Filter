@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.Mod;
  * SubscribeEvent 来自 Forge 自家 eventbus 包 (模板 1.19.2 + v1 1.20.1 双实证, 非 NeoForge 的 bus.api)。
  * [事件类名] 源码基准写 LoggingIn (1.19.2 jar + 1.20.1 v1 双实证);
  * 1.18.2 jar 实证为 LoggedInEvent, 由 build.forge.gradle.kts 的 replacements 按
- * current.parsed < "1.19" 编译期替换 (含本注释与方法名子串, 无害)。
+  * current.parsed &lt; "1.19" 编译期替换 (含本注释与方法名子串, 无害)。
  * [Stonecutter 条件块] 整文件包进 //? forge {}: fabric / neoforge 节点编译时本文件被剔除为空。
  */
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID, value = Dist.CLIENT)

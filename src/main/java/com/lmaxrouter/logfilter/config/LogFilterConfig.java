@@ -93,12 +93,24 @@ public final class LogFilterConfig {
      */
     public static synchronized void init(Path configDir) {
         configFile = configDir.resolve(CONFIG_FILE_NAME);
+        // [2026-11-03 0字节根因修复] 存在性判定必须先于 open():
+        // NightConfig 的 load() 在文件不存在时会先 save() 建出 0 字节空壳, 之后再查 Files.exists 恒为 true,
+        // writeDefaults 永远不触发(实证: NightConfig 3.6.7 行为测试 T1 + run#2 产物 0 字节且无生成日志行)。
+        // 0 字节空壳一并视为未初始化: 旧坏状态自愈(空文件与空壳不可区分, 且写入的默认值与内存兜底值相同, 无行为差异)。
+        boolean firstRun = !Files.exists(configFile);
+        if (!firstRun) {
+            try {
+                firstRun = Files.size(configFile) == 0L;
+            } catch (Exception ignored) {
+                // 大小探测失败(并发删除等罕见竞态): 按已存在处理, 交给 open()/reload() 的既有容错
+            }
+        }
         config = open();
-        // 首次运行: 文件不存在则写默认值+注释。
+        // 首次运行(或空壳自愈): 写默认值+注释。
         // 写盘发生在 ConfigWatcher 启动之前, 自己的写不会触发监听回环(无自触发死循环)
-        if (!Files.exists(configFile)) {
+        if (firstRun) {
             writeDefaults();
-            Constants.LOGGER.info("[config] 未找到配置文件, 已生成默认: {}", configFile);
+            Constants.LOGGER.info("[config] 未找到配置文件(或为空壳), 已生成默认: {}", configFile);
         }
     }
 

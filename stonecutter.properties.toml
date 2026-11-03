@@ -74,10 +74,7 @@ deps.forge = "47.4.28"
 
 [neoforge]
 deps.nightconfig = "3.6.7"
-# [LogFilter v6] neoforge 1.20.1 (47.1.82, net/neoforged/forge 过渡坐标) + 1.20.4 (20.4.253) 新节点
-[neoforge."1.20.1"]
-deps.minecraft = "1.20.1"
-deps.neoforge = "47.1.82"
+# [LogFilter v6] 1.20.4 (20.4.253) 新节点; 1.20.1 (47.1.82) 已砍: CI 41690712571 实证 moddev 只认 net/neoforged/neoforge 坐标, 过渡版不可用
 [neoforge."1.20.4"]
 deps.minecraft = "1.20.4"
 deps.neoforge = "20.4.253"

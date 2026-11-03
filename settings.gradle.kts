@@ -28,11 +28,13 @@ stonecutter {
 		fun match(version: String, vararg loaders: String) =
 			loaders.forEach { version("$version-$it", version).buildscript = "build.$it.gradle.kts" }
 
-		// [LogFilter v6] 12 节点矩阵: fabric x5 / forge x3 / neoforge x4 (GOAL-PLAN v6)
+		// [LogFilter v6] 11 节点矩阵: fabric x5 / forge x3 / neoforge x3 (1.20.1-neoforge 已砍, 见下)
 		match("1.21.11", "fabric", "neoforge")
 		match("1.21.1", "fabric", "neoforge")
 		match("1.20.4", "neoforge")
-		match("1.20.1", "fabric", "forge", "neoforge")
+		// [CI 41690712571 判决] 1.20.1-neoforge 砍: moddev 以 net.neoforged:neoforge 坐标解析 47.1.82 不存在
+		// (过渡版本实际在 net.neoforged:forge 坐标, 插件不认), 次要档失败不救
+		match("1.20.1", "fabric", "forge")
 		match("1.19.2", "fabric", "forge")
 		match("1.18.2", "fabric", "forge")
 

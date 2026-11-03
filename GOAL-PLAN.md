@@ -10,7 +10,7 @@
 - 十二节点:
   - fabric: 1.18.2 / 1.19.2 / 1.20.1 / 1.21.1 / 1.21.11
   - forge: 1.18.2 / 1.19.2 / 1.20.1
-  - neoforge: 1.20.1 / 1.20.4 / 1.21.1 / 1.21.11
+    - neoforge: 1.20.4 / 1.21.1 / 1.21.11 (1.20.1 已砍: CI 41690712571, moddev 找不到 net.neoforged:neoforge:47.1.82)
 - 次要档: 1.20.4-neoforge 与 1.21.11 全系 (能做就做, 失败不救)
 - 版本号: 1.2.0 (v5 已发, 本轮只扩兼容范围, 不改号), channel_tag 空 (stable)
 - 配置文件: config/logfilter-common.toml 三 loader 同格式互通 (TOML, NightConfig)
@@ -25,7 +25,7 @@
 - Gradle wrapper: 腾讯镜像 (mirrors.cloud.tencent.com/gradle/), gradle-9.7.1 200
 - fabricmc / kikugie (releases + snapshots) / plugins.gradle.org / repo1 / parchmentmc: 全 200 本地可达
 - gh / git: Steam++ 代理 + hosts + 系统证书库 = 健康
-- exec 3600s 上限 -> 长构建用 Start-Process 分离 + 日志落盘 + 轮询 (v5 方案沿用)
+- exec 3600s 上限; [2026-11-04 实证] 本会话 PokerAgent 开「任务结束销毁残留进程」: 后台进程在任务回执时被杀, v5 的分离+轮询方案失效 -> 长构建必须单条 exec 内完成 (单节点构建 ~5-15min < 3600s 可行), 每轮冷启动
 
 ## 版本锚点 (maven 实查 2026-11-04)
 | 组件 | 版本 | 来源 |
@@ -39,7 +39,7 @@
 | forge 1.18.2 | 40.3.12 | minecraftforge.net 官方 maven 直查 |
 | forge 1.19.2 | 43.5.2 | minecraftforge.net 官方 maven 直查 |
 | forge 1.20.1 | 47.4.28 | minecraftforge.net 官方 maven 直查 |
-| neoforge 1.20.1 | 47.1.82 | BMCLAPI (net/neoforged/forge 坐标, CI 用官方源) |
+| neoforge 1.20.1 | 47.1.82 | [已砍, CI 41690712571] moddev 只认 net/neoforged/neoforge 坐标, 过渡版不可用 |
 | neoforge 1.20.4 | 20.4.253 | BMCLAPI (net/neoforged/neoforge) |
 | neoforge 1.21.1 | 21.1.213 | v5 实证 (沿用) |
 | neoforge 1.21.11 | 21.11.48 | BMCLAPI 尾部追加区互证 (沿用) |
@@ -55,7 +55,7 @@
 - settings.gradle.kts: pluginManagement 仓库 (mavenLocal + mavenCentral + gradlePluginPortal + Fabric + NeoForged + KikuGie Releases + KikuGie Snapshots + ParchmentMC), includeBuild(build-logic), foojay 1.0.0, stonecutter 0.10-beta.1, loom-back-compat 0.4.1
   - v6 变更: pluginManagement 回补 NeoForged maven (模板原样有, v5 裁剪掉了, forge 节点的 legacyforge 插件 marker 只能从这里解析; 本地不可达但声明无害, CI 墙外畅通)
 - stonecutter create:
-  - match("1.18.2", "fabric", "forge") / match("1.19.2", "fabric", "forge") / match("1.20.1", "fabric", "forge", "neoforge") / match("1.20.4", "neoforge") / match("1.21.1", "fabric", "neoforge") / match("1.21.11", "fabric", "neoforge")
+  - match("1.18.2", "fabric", "forge") / match("1.19.2", "fabric", "forge") / match("1.20.1", "fabric", "forge") / match("1.20.4", "neoforge") / match("1.21.1", "fabric", "neoforge") / match("1.21.11", "fabric", "neoforge") (11 节点, 1.20.1-neoforge 已砍)
   - vcsVersion = "1.20.1-fabric"
   - [2026-11-04 笔误修正] 原矩阵漏写 1.20.4-neoforge (合计 11 节点, 与任务总结的 12 节点矛盾), 补齐; 另: pluginManagement 的 NeoForged maven v5 从未删过 ("v6 回补"为笔误), 实际无需改动
 - 根构建脚本 stonecutter.gradle.kts: swaps (mod_version / mod_id / mod_name / mod_group / minecraft) + loader 常量 + release 常量
@@ -112,7 +112,7 @@
 ## 风险表
 - fabric 1.18.2 loom-back-compat 下探: 模板下限 1.19.2, 1.18.2 超范围高危; 失败则考虑 fabric 1.18.2 节点降级或砍
 - fabric-loader 0.19.2 跑 1.18.2: 2026 loader 跑 2022 游戏, 未证; 失败回退 per-version 覆盖旧 loader (0.14.x)
-- NeoForge 1.20.1 (47.1.82): 过渡坐标 + moddev 支持未证, CI 试, 失败即砍 (次要档精神)
+- [已判决 2026-11-04, CI 41690712571] NeoForge 1.20.1 砍: moddev 以 net.neoforged:neoforge 坐标解析 47.1.82 找不到, 过渡版本实际在 net.neoforged:forge, 插件不认, 按次要档精神不救
 - 1.19.2 事件类名: LoggedInEvent -> LoggingIn 改名期, 具体小版本归属未证, 编译期见真章, 失败则版本分叉
 - forge mods.toml 的 iconFile 未知字段容忍度: 未证, 实测验
 - forge 打包 pack.mcmeta 是否入 jar: 未证, 实测后决定是否补 excludedResources

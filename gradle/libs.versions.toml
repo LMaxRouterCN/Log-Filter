@@ -6,7 +6,7 @@ mod-publish = "2.1.1"
 loomx = "0.4.1"
 neoforge-moddev = "2.0.147"
 serialization-json = "1.7.3"
-serialization-toml = "0.6.0"
+serialization-toml = { module = "dev.eav.tomlkt:tomlkt", version = "0.5.0" }
 
 [libraries]
 mod-publish-plugin = { module = "me.modmuss50:mod-publish-plugin", version.ref = "mod-publish" }

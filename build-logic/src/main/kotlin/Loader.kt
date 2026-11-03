@@ -56,9 +56,9 @@ sealed class Loader(val id: String) {
 					ModrinthEnvironment.CLIENT_OR_SERVER_PREFERS_BOTH, ModrinthEnvironment.CLIENT_OR_SERVER -> "*"
 				},
 				// [LogFilter 迁移] 无 AW / datagen 入口 / mixin: entrypoints 只留 main+client
-				entrypoints = mapOf(
-					"main" to listOf("${ctx.modGroup}.${ctx.modId}.platform.fabric.FabricEntrypoint"),
-					"client" to listOf("${ctx.modGroup}.${ctx.modId}.platform.fabric.FabricClientEntrypoint")
+				entrypoints = mapOf( // [2026-11-03 构建修复] 本项目包根 = modGroup(无 modId 段), 类在 com.lmaxrouter.logfilter.platform.fabric; 原模板拼法 group.modid 适配的是 com.example.modtemplate 型结构, 导致 ClassNotFound("com.lmaxrouter.logfilter.logfilter...")
+					"main" to listOf("${ctx.modGroup}.platform.fabric.FabricEntrypoint"),
+					"client" to listOf("${ctx.modGroup}.platform.fabric.FabricClientEntrypoint")
 				),
 				depends = ctx.extension.dependencies.required.associate { it.modid.get() to it.fabricLikeVersionRange.get() },
 				recommends = ctx.extension.dependencies.optional.associate { it.modid.get() to it.fabricLikeVersionRange.get() },

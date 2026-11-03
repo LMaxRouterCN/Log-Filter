@@ -19,8 +19,11 @@ stonecutter {
 	replace("LoggingIn", "LoggedInEvent")
 	// [CI 41702839086 判决] 1.18.2 无 Component.literal (1.19.2-fabric 编译通过实证分界线=1.19); 全限定名构造器免 import 手术
 	replace("Component.literal(", "new net.minecraft.network.chat.TextComponent(")
-	// [CI 41708614939 判决] forge 1.18.2 compile classpath 的 AsyncAppender Builder 非泛型
-	// (2.11.2+ 全泛型实证 -> forge 钉更老版); raw type 写法, 2.8.2 形态成员全套 javap 实证 (含 BQF/协变 build)
+	}
+	// [CI 41715154075 判决] 1.20.1-forge 的 Builder 同非泛型 (1.19.2-forge 泛型; 泛型性无版本单调性,
+	// 各 userdev 钉的 log4j 独立); raw type 全版本兼容 (非泛型=正常写法, 泛型=raw 合法仅 unchecked 警告)
+	// [CI 41708614939 实证] 2.11.2+ 全泛型 -> 1.18.2/1.20.1-forge 钉 ≤2.11.0 形态; 2.8.2 成员全套 javap 实证 (含 BQF/协变 build)
+	replacements.string(current.parsed < "1.20.2") {
 	replace("AsyncAppender.Builder<?>", "AsyncAppender.Builder")
 	}
 }

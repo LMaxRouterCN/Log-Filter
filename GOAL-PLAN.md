@@ -67,12 +67,12 @@
 1. [x] 信息收集 (代码 10/10, 模板全件, 网络全测)
 2. [x] GOAL-PLAN v5 落盘
 3. [x] git commit 快照 (含 .agent)
-4. [ ] 建 stonecutter 分支 + wrapper + 根级五件配置
-5. [ ] build-logic 平移 + 手术 + cliff/env/workflows/editorconfig
-6. [ ] 源码迁移 (按包结构清单)
-7. [ ] 逐节点 fabric build (1.20.1 -> 1.21.1 -> 1.21.11, Start-Process 协议, 首次全量拉依赖可能 30-60min/节点)
-8. [ ] server 冒烟 (active 版本 runServer: 启动不炸 / 过滤生效 / 热重载 / async 安装行 / 退出排干)
-9. [ ] push origin stonecutter -> 查 CI build.yml 五节点
+4. [x] 建 stonecutter 分支 + wrapper + 根级五件配置
+5. [x] build-logic 平移 + 手术 + cliff/env/workflows/editorconfig (ModPlatformPlugin 190 行 / ModRootPlugin 56 行)
+6. [x] 源码迁移 (按包结构清单; 入口点 = modGroup.platform.fabric.*)
+7. [x] 逐节点 fabric build (本地 1.20.1 全量通过; maven.neoforged.net 本地 DNS 污染, 1.21.x 节点编译由 CI 完成, 五节点 buildAndCollect 实证)
+8. [x] server 冒烟 (深度冒烟全绿: 启动不炸 / async 安装行 queueSize=4096 包装 4 appender / config 自愈[efb121d 修复 NightConfig 3.6.7 load() 建空壳 bug, 0B→4167B 默认落盘] / 过滤生效[规则命中 DEBUG 证据行, 目标行零泄漏] / 热重载[坏 TOML 拒载 + 非法正则容错 WARN + 还原后干净 reload] / 退出排干=shutdownHook 代码证据, taskkill /F 绕过 hook 属结构性不可测)
+9. [x] push origin stonecutter -> CI build.yml 五节点全绿 (run 41604700412 @ efb121d)
 10. [ ] release: max 亲手打 tag 1.2.0 触发 release.yml (tomllib 验 tag = version+channel_tag)
 11. [ ] 完工: D:\Desktop\30分钟后休眠.bat (跑前读内容, AddHours(2) bug 则修 AddMinutes(30), 留痕)
 12. [ ] 终态 memory + GOAL-PLAN 收尾记录

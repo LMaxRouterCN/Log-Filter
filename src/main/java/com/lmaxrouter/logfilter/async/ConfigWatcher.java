@@ -12,6 +12,9 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+// [2026-11-03 构建修复] 迁移期缺失的跨包 import: async 包引用 config 包的 ConfigIssues
+// (javac: ConfigWatcher.java:113 找不到符号 变量 ConfigIssues, 三个 fabric 节点同报; 其余引用方均有此 import)
+import com.lmaxrouter.logfilter.config.ConfigIssues;
 
 /**
  * 配置文件监听器 (v2 热重载, Stonecutter 迁移新增件)。

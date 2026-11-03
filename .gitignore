@@ -18,10 +18,13 @@ build
 .gradle
 
 # other
-eclipse
 run
 
-# Files from Forge MDK
-forge*changelog.txt
+# 本地密钥 (发布 token), 绝不入库
+# Local secrets (publish tokens), never commit.
+.env
 
+# PokerAgent 框架数据 (记忆 / 回收站 / 任务日志)
+.agent/
+.agent_trash/
 .agent_task_logs/

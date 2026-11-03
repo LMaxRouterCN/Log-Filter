@@ -74,8 +74,8 @@
 8. [x] server 冒烟 (深度冒烟全绿: 启动不炸 / async 安装行 queueSize=4096 包装 4 appender / config 自愈[efb121d 修复 NightConfig 3.6.7 load() 建空壳 bug, 0B→4167B 默认落盘] / 过滤生效[规则命中 DEBUG 证据行, 目标行零泄漏] / 热重载[坏 TOML 拒载 + 非法正则容错 WARN + 还原后干净 reload] / 退出排干=shutdownHook 代码证据, taskkill /F 绕过 hook 属结构性不可测)
 9. [x] push origin stonecutter -> CI build.yml 五节点全绿 (run 41604700412 @ efb121d)
 10. [ ] release: max 亲手打 tag 1.2.0 触发 release.yml (tomllib 验 tag = version+channel_tag)
-11. [ ] 完工: D:\Desktop\30分钟后休眠.bat (跑前读内容, AddHours(2) bug 则修 AddMinutes(30), 留痕)
-12. [ ] 终态 memory + GOAL-PLAN 收尾记录
+11. [x] 完工休眠: D:\Desktop\30分钟后休眠.bat (复核健康 AddMinutes(30), 收尾轮已触发)
+12. [x] 终态 memory + GOAL-PLAN 收尾记录 (见文末)
 
 ## 风险表
 - fabric 1.20.1 用 loom 1.18-SNAPSHOT (loom-back-compat 处理), 首次构建拉 SNAPSHOT, 网络通
@@ -93,3 +93,9 @@
 
 ## 历史版本归档
 - v4 (1.1.1 时代): 见 git 历史 f0f0eb4 的 GOAL-PLAN.md (异步化改造 + 1.1.0/1.1.1 发布记录)
+## 收尾记录 (2026-11-03)
+- 步骤 4-9 ✅ (e6c5138); 修复链: efb121d 根治 NightConfig 3.6.7 load() 0 字节空壳 (TestNight 实证, CI 41604700412 五节点绿)
+- 深度冒烟 ✅: config 自愈 (0B→4167B 默认落盘) / 过滤零泄漏 (latest-run2.log=run#3b: DEBUG 证据行 1 条, 真目标残留 0) / 热重载三探针 (debug.log 17:03: 坏 TOML 拒载 + Invalid regex 容错 WARN + 还原后干净 reload) / 终态 config 已还原默认
+- 步骤 11 ✅: 休眠 bat 复核健康 (AddMinutes(30)), 收尾轮已触发
+- 步骤 12 ✅: 终态 memory + 本记录
+- 待 max: 步骤 10 亲手打 tag 1.2.0 -> release.yml; 决策项: 旧 build\libs 三 forge jar 删否 / merge main / README 大改版 / 上游 issue (stonecutter 模板 files.disable 对 active 节点必要性)

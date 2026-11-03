@@ -1,7 +1,6 @@
 package com.lmaxrouter.logfilter.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.InMemoryCommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.lmaxrouter.logfilter.Constants;
 

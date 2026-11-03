@@ -12,6 +12,11 @@ stonecutter {
 		replace("ResourceLocation", "Identifier")
 		replace("location()", "identifier()")
 	}
+	// [CI 41717689211 判决] 1.20.4 (20.4.253) 过渡期: fml.common 有 Mod 无 EventBusSubscriber (单类漂移),
+	// 真实位置 net.neoforged.fml.common.Mod.EventBusSubscriber (FML 源码树实证 嵌套于 Mod.java (Forge 血统形态), sha=f61b1e16); 源码基准写 21.x 位置, 仅 1.20.4 节点编译期替换 (import 行 FQN, 注解简单名不动)
+	replacements.string(current.parsed < "1.20.5") {
+	replace("net.neoforged.fml.common.EventBusSubscriber", "net.neoforged.fml.common.Mod.EventBusSubscriber")
+	}
 	// [2026-11-03 构建修复] active 节点裸编共享根 src, //? 门控注释对 javac 不可见,
 	// 需把对端 loader 的平台源整个排除出编译(DisabledSourceSpec 路径排除, 相对 src/main);
 	// 非 active 节点编译 generated 剥离副本, 行为不变

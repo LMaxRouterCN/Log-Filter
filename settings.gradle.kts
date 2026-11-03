@@ -28,9 +28,13 @@ stonecutter {
 		fun match(version: String, vararg loaders: String) =
 			loaders.forEach { version("$version-$it", version).buildscript = "build.$it.gradle.kts" }
 
+		// [LogFilter v6] 12 节点矩阵: fabric x5 / forge x3 / neoforge x4 (GOAL-PLAN v6)
 		match("1.21.11", "fabric", "neoforge")
 		match("1.21.1", "fabric", "neoforge")
-		match("1.20.1", "fabric")
+		match("1.20.4", "neoforge")
+		match("1.20.1", "fabric", "forge", "neoforge")
+		match("1.19.2", "fabric", "forge")
+		match("1.18.2", "fabric", "forge")
 
 		vcsVersion = "1.20.1-fabric"
 	}

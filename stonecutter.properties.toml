@@ -39,6 +39,13 @@ dev_jvm_args = [
 [fabric]
 deps.fabric-loader = "0.19.2"
 deps.nightconfig = "3.6.7"
+# [LogFilter v6] fabric 1.18.2 / 1.19.2 新节点 (fabric-api 版本锚点见 GOAL-PLAN 版本表)
+[fabric."1.18.2"]
+deps.minecraft = "1.18.2"
+deps.fabric-api = "0.77.0+1.18.2"
+[fabric."1.19.2"]
+deps.minecraft = "1.19.2"
+deps.fabric-api = "0.77.0+1.19.2"
 
 [fabric."1.20.1"]
 deps.minecraft = "1.20.1"
@@ -52,8 +59,28 @@ deps.fabric-api = "0.116.7+1.21.1"
 deps.minecraft = "1.21.11"
 deps.fabric-api = "0.141.6+1.21.11"
 
+# [LogFilter v6] forge 全局段 + 三版本段 (版本锚点: minecraftforge.net 官方 maven 实查 2026-11-04)
+[forge]
+deps.nightconfig = "3.6.7"
+[forge."1.18.2"]
+deps.minecraft = "1.18.2"
+deps.forge = "40.3.12"
+[forge."1.19.2"]
+deps.minecraft = "1.19.2"
+deps.forge = "43.5.2"
+[forge."1.20.1"]
+deps.minecraft = "1.20.1"
+deps.forge = "47.4.28"
+
 [neoforge]
 deps.nightconfig = "3.6.7"
+# [LogFilter v6] neoforge 1.20.1 (47.1.82, net/neoforged/forge 过渡坐标) + 1.20.4 (20.4.253) 新节点
+[neoforge."1.20.1"]
+deps.minecraft = "1.20.1"
+deps.neoforge = "47.1.82"
+[neoforge."1.20.4"]
+deps.minecraft = "1.20.4"
+deps.neoforge = "20.4.253"
 
 [neoforge."1.21.1"]
 deps.minecraft = "1.21.1"

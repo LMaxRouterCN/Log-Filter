@@ -113,6 +113,8 @@
 - fabric 1.18.2 loom-back-compat 下探: 模板下限 1.19.2, 1.18.2 超范围高危; 失败则考虑 fabric 1.18.2 节点降级或砍
 - fabric-loader 0.19.2 跑 1.18.2: 2026 loader 跑 2022 游戏, 未证; 失败回退 per-version 覆盖旧 loader (0.14.x)
 - [已判决 2026-11-04, CI 41690712571] NeoForge 1.20.1 砍: moddev 以 net.neoforged:neoforge 坐标解析 47.1.82 找不到, 过渡版本实际在 net.neoforged:forge, 插件不认, 按次要档精神不救
+- [已判决 2026-11-04, CI 41702839086 + 本地 compile] 1.18.2 无 Component.literal (分界线=1.19, 1.19.2-fabric 全绿实证): fabric/forge 脚本 <1.19 块 replace 成 new net.minecraft.network.chat.TextComponent (commit 2eb40b4); withStyle(ChatFormatting) 1.18.2 存在 (本地 :1.18.2-fabric:compileJava 通过实证)
+- [网络事实 2026-11-04] 本地 forge 全死刑: NFRuntime (net.neoforged:neoform-runtime) 走 maven.neoforged.net, connection refused; forge 三节点构建全交 CI, 本地只验 fabric
 - 1.19.2 事件类名: LoggedInEvent -> LoggingIn 改名期, 具体小版本归属未证, 编译期见真章, 失败则版本分叉
 - forge mods.toml 的 iconFile 未知字段容忍度: 未证, 实测验
 - forge 打包 pack.mcmeta 是否入 jar: 未证, 实测后决定是否补 excludedResources

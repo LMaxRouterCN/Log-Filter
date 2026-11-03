@@ -67,6 +67,6 @@ dependencies {
 	modImplementation("net.fabricmc:fabric-loader:${prop("deps.fabric-loader")}")
 	modImplementation("net.fabricmc.fabric-api:fabric-api:${prop("deps.fabric-api")}")
 	// NightConfig: TOML 配置读取 (Apache-2.0), jar-in-jar 嵌入产物 (见 GOAL-PLAN 待拍板 1)
-	implementation(include("com.electronwill.night-config:core:${prop("deps.nightconfig")}"))
-	implementation(include("com.electronwill.night-config:toml:${prop("deps.nightconfig")}"))
+	implementation(include("com.electronwill.night-config:core:${prop("deps.nightconfig")}")!!)
+	implementation(include("com.electronwill.night-config:toml:${prop("deps.nightconfig")}")!!)
 }

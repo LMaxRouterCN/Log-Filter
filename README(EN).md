@@ -2,6 +2,21 @@
 
 A lightweight log filtering mod designed to reduce spam in the console and log files, allowing developers and players to focus on critical errors and save disk space.
 
+## Supported Versions
+
+The same source tree builds 11 variants, named `logfilter-<version>-<loader>+<mcversion>.jar`. Pick the main jar matching your loader and game version (sources / javadoc jars are developer extras):
+
+| MC Version | Fabric | Forge | NeoForge |
+|---|---|---|---|
+| 1.21.11 | yes | — | yes |
+| 1.21.1 | yes | — | yes |
+| 1.20.4 | — | — | yes |
+| 1.20.1 | yes | yes | — |
+| 1.19.2 | yes | yes | — |
+| 1.18.2 | yes | yes | — |
+
+Pinned toolchain: NeoForge 20.4.253 / 21.1.213 / 21.11.48; Forge 40.3.12 / 43.5.2 / 47.4.28. The transitional NeoForge build for 1.20.1 is absent due to a maven coordinate incompatibility with the build plugin.
+
 ## Features
 
 - **Regex Filtering**: Supports powerful regex matching to precisely filter specific log content.
@@ -19,6 +34,10 @@ A lightweight log filtering mod designed to reduce spam in the console and log f
 3. Launch the game once. The mod will automatically generate a default configuration file.
 4. Modify the configuration file as needed and save — the config hot-reloads automatically (no game restart needed). Invalid regexes are skipped with a warning; see the notes below.
 > Or manually create a `logfilter-common.toml` file, modify the configuration as needed, and then launch the game.
+
+## Building & Development
+
+This repo uses a Stonecutter multi-version template: one shared source tree (src/) builds every variant listed above; platform and version differences are handled with conditional blocks and compile-time replacements. Directory layout, conditional syntax, daily commands, adding version nodes, known pitfalls, and the release pipeline are documented in [DEVELOPING.md](DEVELOPING.md).
 
 ## Configuration Brief
 
@@ -159,9 +178,9 @@ excludePatterns = [
 
 If you want to compile this mod yourself:
 ```bash
-./gradlew build
+./gradlew buildAndCollect
 ```
-The compiled JAR file is located in the `build/libs/` directory.
+Collected JARs land in the root `build/libs/`; multi-version build details in [DEVELOPING.md](DEVELOPING.md).
 
 ---
 

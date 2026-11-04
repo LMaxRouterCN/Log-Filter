@@ -139,3 +139,7 @@
 - 步骤 11 完成: 休眠 bat 复核健康 (AddMinutes(30)), 收尾轮已触发
 - 步骤 12 完成: 终态 memory + 本记录
 - 待 max (v5 遗留): 亲手打 tag 1.2.0 -> release.yml; 决策: 旧 build\libs 三 forge jar 删否 (v6 forge 回归后语境变化: 若 forge 节点重建, 这些 1.1.1 时代 jar 可作对照) / merge main / README 大改版 / 上游 issue (stonecutter 模板 files.disable 对 active 节点必要性)
+## [2026-11-04 CI 修循环战报 (7 轮终)]
+- log4j AsyncAppender.Builder 泛型性与 MC 版本无单调性, 各 userdev 独立钉: 1.18.2/1.20.1-forge 非泛型, 1.19.2-forge 泛型; raw 写法全版本兼容 (仅 unchecked 警告)
+- neoforge 1.20.4 (20.4.253) 过渡期 fml 单类漂移: fml.common 有 Mod 无 EventBusSubscriber, 真实位置 net.neoforged.fml.common.Mod.EventBusSubscriber (嵌套于 Mod.java (Forge 血统形态), FML 源码树实证); 编译期 replace 门控 < 1.20.5
+- javadoc doclint 把注释里裸 < 当非法 HTML 标签头: forge 实证, 修法 &lt; 实体转义

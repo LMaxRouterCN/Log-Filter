@@ -192,7 +192,7 @@ The core idea of this mod is **interception**. It "hijacks" the data before Mine
 
 #### 1. Log Framework Basics: Log4j 2
 
-Minecraft 1.20.1 uses the **Log4j 2** logging framework.
+All supported Minecraft versions (1.18.2–1.21.11) use the **Log4j 2** logging framework (every build node compiles directly against the Log4j 2 core API).
 *   **Log Flow**: Game code generates log events (`LogEvent`) -> Passes to Log4j's `LoggerContext` -> Passes to `Appender` (e.g., console appender, file writer) -> Finally displayed on the screen.
 *   **Filter Mechanism**: Log4j allows mounting "filters (`Filter`)" on Loggers or Appenders.
 * **Async Output Pipeline**: all appenders on the root logger are wrapped into a Log4j2 `AsyncAppender` (enabled by default, configurable): console/file I/O runs on a background thread, the logging thread only pays the enqueue cost; queue size and overflow policy are configurable.
@@ -235,7 +235,7 @@ Our mod performs the following operations via `LogFilterManager.java` when the g
 8.  **Final Verdict**:
     *   If any of the above interception conditions match, we return `Result.DENY`. Upon receiving `DENY`, Log4j immediately discards the log, and it will not appear in the console or file.
     *   If none match, we return `Result.NEUTRAL`. Log4j considers the filter to have "no opinion" and continues to pass the log to the next processor, eventually displaying it normally.
-9. **Config Hot-Reload**: after you edit and save `logfilter-common.toml`, Forge's config file watcher immediately fires the reload event: the async pipeline rebuilds idempotently (skipped if parameters unchanged), filter rules recompile, invalid regexes are skipped with warnings — no game restart needed, all event-driven.
+9. **Config Hot-Reload**: after you edit and save `logfilter-common.toml`, the built-in `ConfigWatcher` (NIO WatchService-based file watching, loader-agnostic) immediately fires the reload event: the async pipeline rebuilds idempotently (skipped if parameters unchanged), filter rules recompile, invalid regexes are skipped with warnings — no game restart needed, all event-driven.
 
 ---
 

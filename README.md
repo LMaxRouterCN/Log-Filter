@@ -200,7 +200,7 @@ excludePatterns = [
 
 #### 1. 日志框架基础：Log4j 2
 
-Minecraft 1.20.1 使用的是 **Log4j 2** 日志框架。
+本模组支持的 1.18.2–1.21.11 全部 Minecraft 版本均使用 **Log4j 2** 日志框架（各节点构建均直接编译 Log4j 2 core API）。
 *   **日志流向**: 游戏代码产生日志事件 (`LogEvent`) -> 传递给 Log4j 的 `LoggerContext` -> 传递给 `Appender`（如控制台输出器、文件写入器） -> 最终显示在屏幕上。
 *   **Filter 机制**: Log4j 允许在 Logger 或 Appender 上挂载“过滤器 (`Filter`)”。
 * **异步输出管线**: root logger 的全部 Appender 会被包装进 Log4j2 `AsyncAppender`（默认开启，可配置）：控制台/文件 I/O 转移到后台线程执行，产生日志的线程只付入队成本，队列容量与满载策略均可配置。
@@ -243,7 +243,7 @@ Minecraft 1.20.1 使用的是 **Log4j 2** 日志框架。
 8.  **最终裁决**:
     *   如果上述任何拦截条件匹配，我们返回 `Result.DENY`。Log4j 收到 `DENY` 后，会立即丢弃该日志，控制台和文件都不会显示。
     *   如果都没匹配，我们返回 `Result.NEUTRAL`。Log4j 认为过滤器“没意见”，继续将日志传给下一个处理器，最终正常显示。
-9. **配置热重载**: 修改并保存 `logfilter-common.toml` 后，Forge 的配置文件监听立即触发重载事件：异步管线按参数签名幂等重建（参数未变则跳过），过滤规则重新编译，非法正则被跳过并告警——全程无需重启游戏。
+9. **配置热重载**: 修改并保存 `logfilter-common.toml` 后，内置的 `ConfigWatcher`（基于 NIO WatchService 的文件监听，与加载器无关）立即触发重载事件：异步管线按参数签名幂等重建（参数未变则跳过），过滤规则重新编译，非法正则被跳过并告警——全程无需重启游戏。
 
 ---
 

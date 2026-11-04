@@ -1,5 +1,9 @@
 name: build
-on: [ push, pull_request ]
+# push 限定 stonecutter 分支: tag push (发版) 不再触发 build CI / push restricted to stonecutter branch: tag pushes no longer trigger build runs
+on:
+  push:
+    branches: [ stonecutter ]
+  pull_request:
 
 jobs:
   build:

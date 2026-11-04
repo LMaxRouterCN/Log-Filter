@@ -151,3 +151,7 @@
 - CurseForge (1783373): publishCurseforge 11 节点 task 全执行, run 绿 (首版建议人工瞄一眼项目页确认)
 - 本次发版新机制: changelog-notes/<version>.md 手写前言 (release.yml 拼接 step) / PUB_CURSEFORGE_ENABLE 渠道开关 / 三渠道 vars + secrets 全量接线
 - 基建观察: 2026-11-04 GitHub Actions 整体劣化 (run 27min 级, 事件队列 18min 级, gh run view 字段滞后造成一次"僵尸"误诊; 判据改步骤级 + run 年龄)
+## [2026-11-05 挂账清算 (max 三裁决)]
+- merge main: 陈账作废 — main 分支不存在 (本地/远端均仅 1.20.1forge 与 stonecutter, origin/HEAD -> stonecutter); v5 记录过时, stonecutter 即默认分支, build.yml 收紧无损失
+- 旧 build\libs jar: v5 记录中三个 1.1.x forge jar 实际不存在 (记录与实况不符); 实存陈年产物已按 max "删了吧" 清除: logfilter-101.beta.jar; build\ 全程 gitignore, 与仓库无涉
+- 上游 issue (stonecutter 模板 files.disable 对 active 节点必要性): 进行中 — 现场重建自 v5 提交 5e08b7d / 330eb27; 当前 v6 树已无 files 配置; 草稿与投递下轮

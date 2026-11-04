@@ -94,6 +94,7 @@ channel_tag: 空 = 正式版 (发布渠道 stable); "-beta.1" 形态会拼进版
     PUB_MODRINTH_PROJECT_ID         Modrinth 项目 ID (Variable)
     PUB_CURSEFORGE_TOKEN            CurseForge API token (Secret)
     PUB_CURSEFORGE_PROJECT_ID       CurseForge 项目 ID (Variable)
+    PUB_CURSEFORGE_ENABLE            CF 渠道总闸, 未过审或暂不发 CF 时关 (不连累 MR/GH 投递)
     PUB_GITHUB_ENABLE               开了才建 GitHub Release
     PUB_MODRINTH_STAGING            Modrinth 走 staging 沙箱 (CurseForge 整个跳过)
 

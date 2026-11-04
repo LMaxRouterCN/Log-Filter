@@ -14,7 +14,9 @@ fun Project.configureModPublishing(ctx: Context) {
 		val modrinthAccessToken = env("PUB_MODRINTH_TOKEN")
 		val curseforgeAccessToken = env("PUB_CURSEFORGE_TOKEN")
 
-		val githubEnabled = envTrue("PUB_GITHUB_ENABLE")
+	val githubEnabled = envTrue("PUB_GITHUB_ENABLE")
+	// [2026-11-05] CF 渠道独立开关: 项目未过审/凭证未就绪时跳过 CF 投递, 不连累 MR/GH (PUB_CURSEFORGE_ENABLE)
+	val curseforgeEnabled = envTrue("PUB_CURSEFORGE_ENABLE")
 		if (envTrue("PUB_DRY_RUN") || !envTrue("PUB_MODS_ENABLE")) {
 			dryRun = true
 		}
@@ -47,7 +49,7 @@ fun Project.configureModPublishing(ctx: Context) {
 		}
 
 		modrinth(ctx, ctx.publishAdditionalVersions, mrStaging, modrinthAccessToken)
-		if (!mrStaging) curseforge(ctx, ctx.publishAdditionalVersions, curseforgeAccessToken)
+		if (!mrStaging && curseforgeEnabled) curseforge(ctx, ctx.publishAdditionalVersions, curseforgeAccessToken)
 	}
 }
 

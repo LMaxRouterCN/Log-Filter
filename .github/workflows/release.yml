@@ -66,6 +66,16 @@ jobs:
           args: --latest --strip header --output CHANGELOG.md
           version: 'v2.13.1'
 
+      - name: Prepend handwritten release note
+        run: |
+          NOTE_FILE="changelog-notes/${GITHUB_REF_NAME#v}.md"
+          if [[ -f "$NOTE_FILE" ]]; then
+            echo "Prepending handwritten note: $NOTE_FILE"
+            cat "$NOTE_FILE" CHANGELOG.md > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+          else
+            echo "No handwritten note for tag ${GITHUB_REF_NAME}, keeping generated changelog only"
+          fi
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:

@@ -143,3 +143,11 @@
 - log4j AsyncAppender.Builder 泛型性与 MC 版本无单调性, 各 userdev 独立钉: 1.18.2/1.20.1-forge 非泛型, 1.19.2-forge 泛型; raw 写法全版本兼容 (仅 unchecked 警告)
 - neoforge 1.20.4 (20.4.253) 过渡期 fml 单类漂移: fml.common 有 Mod 无 EventBusSubscriber, 真实位置 net.neoforged.fml.common.Mod.EventBusSubscriber (嵌套于 Mod.java (Forge 血统形态), FML 源码树实证); 编译期 replace 门控 < 1.20.5
 - javadoc doclint 把注释里裸 < 当非法 HTML 标签头: forge 实证, 修法 &lt; 实体转义
+
+## [2026-11-04 发版终章: v1.2.0 已上线三平台]
+- 点火链: CI 41880071296 全绿 (7m7s) -> tag 1.2.0 -> release run 41881427449 成功 (7m11s)
+- GH Release 1.2.0: 22 附件 (11 mod jar + 11 sources jar), body = 手写双语段 (changelog-notes/1.2.0.md) + cliff 生成段
+- Modrinth (AbUDTUku): 11 个 1.2.0 版本条目, 每条 jar + sources
+- CurseForge (1783373): publishCurseforge 11 节点 task 全执行, run 绿 (首版建议人工瞄一眼项目页确认)
+- 本次发版新机制: changelog-notes/<version>.md 手写前言 (release.yml 拼接 step) / PUB_CURSEFORGE_ENABLE 渠道开关 / 三渠道 vars + secrets 全量接线
+- 基建观察: 2026-11-04 GitHub Actions 整体劣化 (run 27min 级, 事件队列 18min 级, gh run view 字段滞后造成一次"僵尸"误诊; 判据改步骤级 + run 年龄)

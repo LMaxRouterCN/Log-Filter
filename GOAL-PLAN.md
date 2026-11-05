@@ -100,7 +100,7 @@
 2. [x] GOAL-PLAN v6 落盘
 3. [x] git commit 快照 (8b0c6f8: v6 落盘即快照)
 4. [x] build-logic 手术 (978a232; 清单 2 砍掉, 3/4/7 完成, 5 并入 6, 6 待实测)
-5. [x] 根配置 (5e08b7d + 330eb27: settings 12 节点 match / deps 表新段 / legacyforge 回补 / files.disable 互斥)
+5. [x] 根配置 (5e08b7d + 330eb27: settings 12 节点 match / deps 表新段 / legacyforge 回补; files.disable 互斥 = 505088e 引入)
 6. [x] 节点脚本 build.forge.gradle.kts (模板裁剪 + 事件名 1.18.2 分叉 replacements; jar 实证)
 7. [x] 源码: platform/forge 两类 (ForgeMod / ForgeClientEvents 镜像 NeoForge 双件; 事件名 jar 实证 1.18.2=LoggedInEvent / 1.19.2+1.20.1=LoggingIn)
 8. [ ] 本地试构建 fabric 1.18.2 (loom-back-compat 下探测试, 超模板下限属高危)
@@ -154,4 +154,8 @@
 ## [2026-11-05 挂账清算 (max 三裁决)]
 - merge main: 陈账作废 — main 分支不存在 (本地/远端均仅 1.20.1forge 与 stonecutter, origin/HEAD -> stonecutter); v5 记录过时, stonecutter 即默认分支, build.yml 收紧无损失
 - 旧 build\libs jar: v5 记录中三个 1.1.x forge jar 实际不存在 (记录与实况不符); 实存陈年产物已按 max "删了吧" 清除: logfilter-101.beta.jar; build\ 全程 gitignore, 与仓库无涉
-- 上游 issue (stonecutter 模板 files.disable 对 active 节点必要性): 进行中 — 现场重建自 v5 提交 5e08b7d / 330eb27; 当前 v6 树已无 files 配置; 草稿与投递下轮
+- 上游 issue (stonecutter 模板 files.disable 对 active 节点必要性): 已判决 2026-11-05, 定性 = 文档缺口 (非 bug)
+  - 修正误记: "当前 v6 树已无 files 配置"不实 — 实况三节点在役 (build.fabric L23 / build.forge L14 / build.neoforge L24); files.disable 引入提交 = 505088e
+  - 判决双证: 探针 A (//? fabric 激活态) generate 副本壳被剥离出裸码; 探针 B (//? neoforge 禁用态) 副本壳原样保留 = javac 合法空文件; 源码链: FileAstUncommenter.uncommentCode + SlashStarUncommentingStrategy (删 COMMENT_OPEN/CLOSE)
+  - 模板侧实锤: rotgruengelb/stonecutter-mod-template 的 ForgeEntrypoint 壳形态首日 commit 17384b3 即存在; 星注释壳与 files.disable = 两条平行野生解法, 官方文档均零记载
+  - 交付: 草稿 drafts/issue-stonecutter-doc-gap.md (双语中文优先); 投递目标两选一待 max 定 (Codeberg stonecutter 主仓 / GitHub 模板仓); max 过目前不投递

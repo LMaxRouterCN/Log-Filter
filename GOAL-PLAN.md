@@ -160,4 +160,4 @@
   - 模板侧实锤: rotgruengelb/stonecutter-mod-template 的 ForgeEntrypoint 壳形态首日 commit 17384b3 即存在; 星注释壳与 files.disable = 两条平行野生解法, 官方文档均零记载
   - 交付: 草稿 drafts/issue-stonecutter-doc-gap.md (双语, 中文留档); 已双投递 2026-11-06 (max 授权只发英文版): GitHub rotgruengelb/stonecutter-mod-template#40 + Codeberg stonecutter/stonecutter#77, 两侧互 cross-link (Codeberg body 尾链 + GitHub #40 评论)
   - 上游答复 (2026-11-06, KikuGie, Codeberg#77 评论): active 版本条件状态不正确时, 设计意图 = 先跑 Gradle Reset active project 任务; files.disable 与星注释壳两条解法均确认正确 (本项目在用的 files.disable 路线获上游背书)
-  - issue 现状: open; 未获补文档承诺, 跟进追问/致谢/关闭与否待 max 定; GitHub 孪生 #40 是否同步此答案也待 max 定
+  - issue 现状: open, 放置 (max 2026-11-06 决策: 不同步 GitHub#40, 不跟进追问; cross-link 评论已使 #40 读者可点至 Codeberg#77 见维护者答案); 补文档与否随上游

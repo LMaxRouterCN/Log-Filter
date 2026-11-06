@@ -3,6 +3,7 @@
 > 状态: 已投递 2026-11-06 (max 授权: 两个项目都发, 只发英文版; 中文正文留档未投)
 > A. Codeberg stonecutter/stonecutter 主项目: https://codeberg.org/stonecutter/stonecutter/issues/77
 > B. GitHub rotgruengelb/stonecutter-mod-template: https://github.com/rotgruengelb/stonecutter-mod-template/issues/40
+> 上游答复 (2026-11-06, KikuGie @ Codeberg#77): active 版本条件状态不正确时, 设计意图是先跑 Reset active project 任务; files.disable 与星注释壳两条解法均被确认正确
 
 ## 标题候选
 

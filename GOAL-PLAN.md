@@ -159,3 +159,5 @@
   - 判决双证: 探针 A (//? fabric 激活态) generate 副本壳被剥离出裸码; 探针 B (//? neoforge 禁用态) 副本壳原样保留 = javac 合法空文件; 源码链: FileAstUncommenter.uncommentCode + SlashStarUncommentingStrategy (删 COMMENT_OPEN/CLOSE)
   - 模板侧实锤: rotgruengelb/stonecutter-mod-template 的 ForgeEntrypoint 壳形态首日 commit 17384b3 即存在; 星注释壳与 files.disable = 两条平行野生解法, 官方文档均零记载
   - 交付: 草稿 drafts/issue-stonecutter-doc-gap.md (双语, 中文留档); 已双投递 2026-11-06 (max 授权只发英文版): GitHub rotgruengelb/stonecutter-mod-template#40 + Codeberg stonecutter/stonecutter#77, 两侧互 cross-link (Codeberg body 尾链 + GitHub #40 评论)
+  - 上游答复 (2026-11-06, KikuGie, Codeberg#77 评论): active 版本条件状态不正确时, 设计意图 = 先跑 Gradle Reset active project 任务; files.disable 与星注释壳两条解法均确认正确 (本项目在用的 files.disable 路线获上游背书)
+  - issue 现状: open; 未获补文档承诺, 跟进追问/致谢/关闭与否待 max 定; GitHub 孪生 #40 是否同步此答案也待 max 定

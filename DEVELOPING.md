@@ -105,3 +105,26 @@ env 解析顺序: 进程环境变量 → 仓库根 .env 文件 (java Properties 
 ### 依赖链接
 
 节点脚本 dependencies 块声明的模组关系 (required / optional / incompatible / embeds) 发布时转成平台依赖链接, 但只有设置了 slug 的才生效。当前只有 fabric-api 设了 slug, 所以 forge 系条目在平台上没有依赖链接 (minecraft / forge / neoforge 属于平台本体, 不链也正常)。
+
+## Stonecutter 官方文档与上游 issue 记录
+
+文档源: Codeberg 仓库 stonecutter/docs 的 main 分支, 源文件在 docs/wiki/v2/ 下。渲染站旧链 /wiki/tips/* 已 302 跳 /wiki/v2/guides/tips/*, 老链接不死, 但按源码路径找文件一律用 v2 新路径。
+
+绕开渲染站直接读 markdown 源文件:
+
+    https://codeberg.org/stonecutter/docs/raw/branch/main/docs/wiki/v2/<路径>.md
+
+最大的坑: 页面主文件里大量正文被 <!--@versions--> 注释标记拆走, 实际内容在同目录 _versions/ 子目录的版本分片里 (形如 <节名>.<起止版>.md, 0.10-.md 即 0.10 及以后)。主文件只剩节标题骨架, 不翻分片就会误判"未记载"。2026-11 核 files.disable 时在这栽过: custom-formats 主文件只有三个节标题, API 全文在 _versions/custom-formats-disabling.0.10-.md。教训: 页面里没搜到 ≠ 不存在, 先列 _versions/ 目录。
+
+### 已核实的文档落点 (2026-11 全量核验, 均有回执)
+
+- files.disable: reference/gradle-api/custom-formats 的 Disabling Files 节。语义 = 整文件注释 (前置 stonecutter-disabled 标记) + 排除出构建。0.9 时代属性名是 filters。
+- 壳语法 (条件块注释形态): 模板 README 示例区 + reference/syntax/conditions。
+- Reset active project 任务: glossary 的 VCS Version 词条 (任务名原文记载) + ij-plugin 页 + project-controller 的 stonecutterSwitchTo... 任务族。设计意图: 切 active version 是原地改写 src/, 产生的 diff 对版本控制无意义, 故指定 VCS 版本为 reset 点, commit 前先归位。
+- active version 三形态 (字面量 / file(...) / null 即 detached 不链接共享 src): project-controller 的 Active Version 节。
+- 任务聚合 stonecutter.tasks.named(...) / 排序 order(...) / 切换任务 stonecutter.tasks.switch: project-controller 的 Task Hooks 节。
+- 共享参数 parameters {}: project-controller 的 Shared Parameters 节。
+
+### 上游 issue 链 (已终态, 勿重复投递)
+
+GitHub stonecutter#40 与 Codeberg stonecutter/stonecutter#77, 同一问题双投递: 切完 active version 后本地构建会带进未激活版本的源码。KikuGie 答复: 单节点直构建 (:<节点>:build, active 节点源码本就已生成) 或 files.disable 排除非 active 源码, 两解法实测均有效。我们当初 "neither is documented" 的前提经全量核验为误 (文档都在 v2 reference 层, 当初没搜到是查法问题), 已决策不再跟进, cross-link 评论使答案双向可达。根目录 README_verify.md 是该轮核验的临时快照, 可删。

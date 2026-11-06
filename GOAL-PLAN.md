@@ -158,4 +158,4 @@
   - 修正误记: "当前 v6 树已无 files 配置"不实 — 实况三节点在役 (build.fabric L23 / build.forge L14 / build.neoforge L24); files.disable 引入提交 = 505088e
   - 判决双证: 探针 A (//? fabric 激活态) generate 副本壳被剥离出裸码; 探针 B (//? neoforge 禁用态) 副本壳原样保留 = javac 合法空文件; 源码链: FileAstUncommenter.uncommentCode + SlashStarUncommentingStrategy (删 COMMENT_OPEN/CLOSE)
   - 模板侧实锤: rotgruengelb/stonecutter-mod-template 的 ForgeEntrypoint 壳形态首日 commit 17384b3 即存在; 星注释壳与 files.disable = 两条平行野生解法, 官方文档均零记载
-  - 交付: 草稿 drafts/issue-stonecutter-doc-gap.md (双语中文优先); 投递目标两选一待 max 定 (Codeberg stonecutter 主仓 / GitHub 模板仓); max 过目前不投递
+  - 交付: 草稿 drafts/issue-stonecutter-doc-gap.md (双语, 中文留档); 已双投递 2026-11-06 (max 授权只发英文版): GitHub rotgruengelb/stonecutter-mod-template#40 + Codeberg stonecutter/stonecutter#77, 两侧互 cross-link (Codeberg body 尾链 + GitHub #40 评论)

@@ -1,7 +1,8 @@
 # 上游 issue 草稿 — Stonecutter active 节点直通与两条未记载解法 (文档缺口)
 
-> 状态: 草稿, 待 max 过目, 未投递
-> 候选投递处 (两选一): A. Codeberg stonecutter/stonecutter 主项目 (文档) / B. GitHub rotgruengelb/stonecutter-mod-template
+> 状态: 已投递 2026-11-06 (max 授权: 两个项目都发, 只发英文版; 中文正文留档未投)
+> A. Codeberg stonecutter/stonecutter 主项目: https://codeberg.org/stonecutter/stonecutter/issues/77
+> B. GitHub rotgruengelb/stonecutter-mod-template: https://github.com/rotgruengelb/stonecutter-mod-template/issues/40
 
 ## 标题候选
 
